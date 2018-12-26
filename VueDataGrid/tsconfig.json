@@ -9,8 +9,9 @@
       "lib": [
          "dom",
          "es5",
-         "es2015.promise"
-      ]
+      ],
+      "declaration": true,
+      "declarationDir": "dist"
    },
    "compileOnSave": false
 }

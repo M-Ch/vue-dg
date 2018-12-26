@@ -1,6 +1,7 @@
 ﻿const MiniCssExtractPlugin = require("mini-css-extract-plugin");
 const webpack = require("webpack");
 const OptimizeCssnanoPlugin = require('@intervolga/optimize-cssnano-plugin');
+const VueLoaderPlugin = require('vue-loader/lib/plugin');
 
 module.exports = env => {
    const isProd = env && env.prod;
@@ -19,6 +20,7 @@ module.exports = env => {
             filename: "[name].css",
             chunkFilename: "[id].css"
          }),
+         new VueLoaderPlugin(),
          new webpack.IgnorePlugin(/^\.\/locale$/, /moment$/)
       ],
       resolve: {
@@ -32,8 +34,13 @@ module.exports = env => {
          rules: [
             {
                test: /\.tsx?$/,
-               use: 'ts-loader',
-               exclude: /node_modules/
+               loader: 'ts-loader',
+               exclude: /node_modules/,
+               options: { appendTsSuffixTo: [/\.vue$/] }
+            },
+            {
+               test: /\.vue$/,
+               loader: 'vue-loader'
             },
             {
                test: /\.(png|jpg|gif|ttf|eot|svg|woff|woff2)$/,
