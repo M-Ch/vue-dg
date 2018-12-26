@@ -1,7 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Web.Http;
+﻿using System.Web.Http;
+using System.Web.Http.OData.Builder;
+using System.Web.Http.OData.Extensions;
+using VueDataGrid.Sample.Controllers;
 
 namespace VueDataGrid.Sample
 {
@@ -14,6 +14,10 @@ namespace VueDataGrid.Sample
 			// Web API routes
 			config.MapHttpAttributeRoutes();
 
+			ODataConventionModelBuilder modelBuilder = new ODataConventionModelBuilder();
+			modelBuilder.EntitySet<SampleItem>("sampleSet");
+			var model = modelBuilder.GetEdmModel();
+			config.Routes.MapODataServiceRoute(routeName: "OData", routePrefix: "odata", model: model);
 			config.Routes.MapHttpRoute(
 				name: "DefaultApi",
 				routeTemplate: "api/{controller}/{id}",
