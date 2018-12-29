@@ -5,7 +5,8 @@
 		<data-column uid="2" :name="foo"></data-column>
 	</data-grid>
 	<input type="text" v-model="foo"/>
-	<button v-on:click="names.push('dynamic '+names.length)">add column</button>
+	<button v-on:click="names.push('dynamic '+id++)">add column</button>
+	<button v-on:click="names.splice(0, 1)">remove column</button>
 </div>
 
 

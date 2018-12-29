@@ -16,6 +16,9 @@ export default Vue.extend({
    mounted(this: IThis) {
       this.syncName();
    },
+   beforeDestroy(this: IThis) {
+      this.withGrid(i => i.destroy(this.uid));
+   },
    watch: {
       name: "syncName"
    },

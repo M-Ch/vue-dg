@@ -1,5 +1,6 @@
 export interface IDataGrid {
    setName: (uid: string, name: string) => void;
+   destroy: (uid: string) => void;
 }
 
 export interface IDataColumn {

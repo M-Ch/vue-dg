@@ -45,7 +45,11 @@ export default Vue.extend({
       setName(this: IThis, uid, name) {
          this.updateColumn(uid, column => column.name = name);
       },
-
+      destroy(this: IThis, uid) {
+         const index = this.columns.findIndex(i => i.uid === uid);
+         if(index >= 0)
+            this.columns.splice(index, 1);
+      },
       updateColumn(this: IThis, uid, setup) {
          const index = chain(this.$slots.default as VNode[])
             .select(i => i.children)
