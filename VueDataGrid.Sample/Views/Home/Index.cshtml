@@ -1,6 +1,11 @@
 ﻿<div id="test">
-	Hello {{foo}}
-	<hello-world message="Hello test"></hello-world>
+	<data-grid>
+		<data-column uid="1" name="test"></data-column>
+		<data-column v-for="name in names" :uid="name" :key="name" :name="name"></data-column>
+		<data-column uid="2" :name="foo"></data-column>
+	</data-grid>
+	<input type="text" v-model="foo"/>
+	<button v-on:click="names.push('dynamic '+names.length)">add column</button>
 </div>
 
 

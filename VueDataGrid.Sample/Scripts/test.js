@@ -2,7 +2,8 @@
 
 new Vue({
 	data: {
-		foo: "bar"
+		foo: "bar",
+		names: ["aa"]
 	},
 	el: "#test"
 });
