@@ -166,9 +166,10 @@ export default Vue.extend({
          return h("th", {
             class: canSort ? "can-sort" : null,
             on: {
-               click: () => {
+               click: (e: Event) => {
                   if(!canSort || !data.field)
                      return;
+                  e.preventDefault();
                   function cycleSorting(current?: SortDirection) {
                      //asc -> desc -> null
                      if(current === SortDirection.Asc)
@@ -193,7 +194,7 @@ export default Vue.extend({
             if(!column.template) {
                if(column.field)
                   return data[column.field];
-               logError("Data column has not field and no template defined. It will be always empty.");
+               logError("Data column has no field and no template defined. It will be always empty.");
                return "";
             }
 
@@ -213,10 +214,11 @@ export default Vue.extend({
          return h("tr", cells);
       };
 
+      const cols = columns.map(i => h("col", { style: { width: i.width ? i.width : undefined } }));
       const thead = h("thead", {class: "dg-head"}, [h("tr", {}, headerCells)]);
       const dataRows = this.vPageData.map(renderRow);
       const tbody = h("tbody", { class: "dg-body" }, dataRows);
-      const dataTable = h("table", { class: "dg-table" }, [thead, tbody]);
+      const dataTable = h("table", { class: "dg-table" }, [cols, thead, tbody]);
 
       const slot = h("div", { class: "dg-hidden" }, this.$slots.default ? this.$slots.default : []);
       return h("div", {

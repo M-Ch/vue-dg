@@ -33,6 +33,13 @@ class Enumerable<T> {
       return true;
    }
 
+   public sum(selector: (item: T) => number) {
+      let result = 0;
+      for(const item of this.items())
+         result += selector(item);
+      return result;
+   }
+
    public any(predicate: (item: T) => boolean) {
       for(const item of this.items()) {
          if(predicate(item))

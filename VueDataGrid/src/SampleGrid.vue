@@ -2,8 +2,8 @@
    <div>
       <div id="sample">
          <data-grid :page="page" :source="data" :page-size="5" :sorting="['f2', 'f3']" :sortable="canSort">
-            <data-column :field="column.field" :name.sync="column.name" v-for="column in columns" :key="column.id" template="field-tpl"></data-column>
-            <data-column name="Commands" template="commands-tpl"></data-column>
+            <data-column width="40%" :field="column.field" :name.sync="column.name" v-for="column in columns" :key="column.id" template="field-tpl"></data-column>
+            <data-column name="Commands" template="commands-tpl" width="100px"></data-column>
             <div slot="head-off" slot-scope="column">
                <b>header-tpl: {{column.name}}</b>
             </div>
