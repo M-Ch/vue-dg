@@ -1,13 +1,20 @@
 <template>
    <div>
       <data-grid :page="page" :source="data" :page-size="2">
-         <data-column field="f1" name="foo"></data-column>
-         <data-column :field="column.field" :name.sync="column.name" v-for="column in columns" :key="column.id"></data-column>
+         <data-column :field="column.field" :name.sync="column.name" v-for="column in columns" :key="column.id" template="field-tpl"></data-column>
+         <data-column name="Commands" template="commands-tpl"></data-column>
          <div slot="head-off" slot-scope="column">
             <b>header-tpl: {{column.name}}</b>
          </div>
+         <div slot="field-tpl" slot-scope="{value}">
+            <i>{{value}}</i>
+         </div>
+         <div slot="commands-tpl" slot-scope="{row}">
+            <button v-on:click="itemAction(row)">show f3 value</button>
+         </div>
       </data-grid>
       <button v-on:click="append">append</button>
+      <button v-on:click="test = 'bb'">change test</button>
    </div>
 </template>
 
@@ -40,6 +47,9 @@ export default Vue.extend({
    methods: {
       append() {
          this.page++;
+      },
+      itemAction(item: any) {
+         alert(item.f3);
       }
    }
 })

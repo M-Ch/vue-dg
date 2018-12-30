@@ -4,6 +4,10 @@ import { IDataColumn, DataColumn } from "./DataColumn";
 import buildSource, { IDataSource, IDataRequest } from "../DataSource";
 import { chain } from '@/linq';
 
+function logError(message: string) {
+   if(!Vue.config.silent)
+      console.error(message);
+}
 
 interface IMethods {
    switchPage: (page: number, forceReload?: boolean) => void;
@@ -115,10 +119,26 @@ export default Vue.extend({
          //       //instance.$emit("update:name", (instance as any as IDataColumn).name + "@");
          //    }
          // }
-         }, [headTpl ? headTpl(data) : data.field]));
+         }, [headTpl ? headTpl(data) : data.name ? data.name : data.field]));
 
       const renderCell = (data: any, column: IDataColumn) => {
-         return h("td", column.field ? data[column.field] : "todo");
+         const buildContent = () => {
+            if(!column.template) {
+               if(column.field)
+                  return data[column.field];
+               logError("Data column has not field and no template defined. It will be always empty.");
+               return "";
+            }
+
+            const tpl = this.$scopedSlots[column.template];
+            if(!tpl) {
+               logError(`Unable to find scoped slot named '${column.template}' defined as template for grid data column.`);
+               return "";
+            }
+
+            return tpl({row: data, value: column.field ? data[column.field] : null});
+         };
+         return h("td", [buildContent()]);
       };
 
       const renderRow = (data: any) => {
