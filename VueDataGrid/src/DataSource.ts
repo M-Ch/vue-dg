@@ -1,19 +1,19 @@
 //promises by hand - for better compatibility ane less dependencies
 
-export enum OrderDirection {
+export enum SortDirection {
    Asc = "asc",
    Desc = "desc"
 }
 
-export interface IOrderEntry {
+export interface ISortField {
    field: string;
-   direction: OrderDirection;
+   direction: SortDirection;
 }
 
 export interface IDataRequest {
    page: number;
    pageSize: number;
-   ordering: IOrderEntry[];
+   sorting: ISortField[];
 }
 
 export class DataPromise {
@@ -97,9 +97,9 @@ function arraySource(values: any[]): IDataSource {
       load(data) {
          return new DataPromise((onSuccess, _, onAlways) => {
             const copy = values.slice();
-            if(data.ordering.length > 0)
+            if(data.sorting.length > 0)
                copy.sort((a, b) => {
-                  for(const entry of data.ordering) {
+                  for(const entry of data.sorting) {
                      if(a[entry.field] === b[entry.field])
                         continue;
                      let isLower = a[entry.field] < b[entry.field];

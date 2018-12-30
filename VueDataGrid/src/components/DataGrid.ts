@@ -1,8 +1,9 @@
 import Vue,{ VNode, VNodeComponentOptions, VNodeData } from "vue";
 import { cast } from "./Grid";
 import { IDataColumn, DataColumn } from "./DataColumn";
-import buildSource, { IDataSource, IDataRequest } from "../DataSource";
-import { chain } from '@/linq';
+import buildSource, { IDataSource, IDataRequest, ISortField, SortDirection } from "../DataSource";
+import { chain, range } from '@/linq';
+import "./DataGrid.less";
 
 function logError(message: string) {
    if(!Vue.config.silent)
@@ -19,6 +20,7 @@ interface IData {
    vDataSource: IDataSource;
    vFetchId: number;
    vPageData: any[];
+   vSorting: ISortField[];
 }
 
 interface IThis extends Vue, IMethods, IData {
@@ -26,24 +28,45 @@ interface IThis extends Vue, IMethods, IData {
    pageSize: number;
    source: any;
    sourceOptions: any;
+   sorting: ISortField[];
+   sortable: boolean;
+}
+
+function normalizeSorting(candidate: any): ISortField[] {
+
+   function normalizeField(field: any): ISortField {
+      if(typeof field === "string")
+         return {field, direction: SortDirection.Asc};
+      return {
+         field: field.field,
+         direction: field.direction ? field.direction : SortDirection.Asc
+      };
+   }
+
+   return Array.isArray(candidate)
+      ? candidate.map(normalizeField)
+      : [normalizeField(candidate)];
 }
 
 export default Vue.extend({
    name: "DataGrid",
    data() {
-      //const self = this as IThis;
+      const self = this as any as IThis;
       return cast<IData>({
          vPage: 0,
          vFetchId: 0,
-         vDataSource: buildSource(this.source, this.sourceOptions),
-         vPageData: []
+         vDataSource: buildSource(self.source, self.sourceOptions),
+         vPageData: [],
+         vSorting: self.sorting ? normalizeSorting(self.sorting) : []
       });
    },
    mounted(this: IThis) {
       this.switchPage(this.page, true);
    },
    watch: {
-      page: "switchPage",
+      page(this: IThis) {
+         this.switchPage(this.page);
+      },
       source(this: IThis) {
          this.vDataSource = buildSource(this.source, this.sourceOptions);
       },
@@ -52,6 +75,23 @@ export default Vue.extend({
       },
       vDataSource(this: IThis) {
          this.switchPage(0, true);
+      },
+      sorting(this: IThis) {
+         const areEqual = (a: ISortField[], b: ISortField[]) => {
+            if(a ? !b : b) //a xor b
+               return false;
+            if(!a && !b)
+               return true;
+            if(a.length !== b.length)
+               return false;
+            return range(0, a.length).all(index => a[index].direction === b[index].direction && a[index].field === b[index].field);
+         };
+         const candidate = normalizeSorting(this.sorting);
+         if(!areEqual(this.vSorting, candidate))
+            this.vSorting = candidate;
+      },
+      vSorting(this: IThis) {
+         this.fetchSource();
       }
    },
    props: {
@@ -59,7 +99,9 @@ export default Vue.extend({
      pageSize: { type: Number, default: 10 },
      source: { default: null },
      sourceOptions: { default: null },
-     isLoading: { type: Boolean, default: false }
+     isLoading: { type: Boolean, default: false },
+     sorting: { type: Array, default: () => [] },
+     sortable: { type: Boolean, default: true }
    },
    methods: cast<IMethods>({
       switchPage(this: IThis, page, forceReload) {
@@ -73,7 +115,7 @@ export default Vue.extend({
          this.vFetchId++;
          const fetchId = this.vFetchId;
          const request: IDataRequest = {
-            ordering: [],
+            sorting: this.vSorting,
             page: this.page,
             pageSize: this.pageSize
          };
@@ -107,19 +149,44 @@ export default Vue.extend({
             .toList();
       };
 
+      const sorting: {[key: string]: SortDirection} = {};
+      this.vSorting.forEach(i => sorting[i.field] = i.direction ? i.direction : SortDirection.Asc);
+
       const columns = findColumns();
       const headTpl = this.$scopedSlots.head;
-      const headerCells = columns.map(data => h("th", {
-         // on: {
-         //    click: () => {
-         //       //const instance = data.componentInstance as Vue;
-         //       //const column = instance as any as IDataColumn;
-         //       //column.name += "$";
-         //       //this.switchPage(this.vPage+1);
-         //       //instance.$emit("update:name", (instance as any as IDataColumn).name + "@");
-         //    }
-         // }
-         }, [headTpl ? headTpl(data) : data.name ? data.name : data.field]));
+      const headerCells = columns.map(data => {
+         const title = headTpl ? headTpl(data) : data.name ? data.name : data.field;
+         const canSort = this.sortable && (data.sortable || data.sortable === undefined) && data.field;
+         const columnSorting = data.field ? sorting[data.field] : null;
+         const content = [
+            h("span",{ class: "sort-direction" }, columnSorting ? (columnSorting === "asc" ? "↑" : "↓") : ""),
+            title
+         ];
+
+         return h("th", {
+            class: canSort ? "can-sort" : null,
+            on: {
+               click: () => {
+                  if(!canSort || !data.field)
+                     return;
+                  function cycleSorting(current?: SortDirection) {
+                     //asc -> desc -> null
+                     if(current === SortDirection.Asc)
+                        return SortDirection.Desc;
+                     if(current === SortDirection.Desc)
+                        return null;
+                     return SortDirection.Asc;
+                  }
+                  const entry = this.vSorting.find(i => i.field === data.field);
+                  const newDirection = cycleSorting(entry ? entry.direction : undefined);
+                  this.vSorting = newDirection
+                     ? [{field: data.field, direction: newDirection}]
+                     : [];
+                  this.$emit("update:sorting", this.vSorting);
+               }
+            }
+            }, content);
+      });
 
       const renderCell = (data: any, column: IDataColumn) => {
          const buildContent = () => {
@@ -146,14 +213,14 @@ export default Vue.extend({
          return h("tr", cells);
       };
 
-      const thead = h("thead", {}, [h("tr", {}, headerCells)]);
+      const thead = h("thead", {class: "dg-head"}, [h("tr", {}, headerCells)]);
       const dataRows = this.vPageData.map(renderRow);
-      const tbody = h("tbody", {}, dataRows);
-      const dataTable = h("table", {}, [thead, tbody]);
+      const tbody = h("tbody", { class: "dg-body" }, dataRows);
+      const dataTable = h("table", { class: "dg-table" }, [thead, tbody]);
 
       const slot = h("div", { class: "dg-hidden" }, this.$slots.default ? this.$slots.default : []);
       return h("div", {
-         class: "dh-grid"
+         class: "dg-grid"
       }, [h("div", {}, "" + this.vPage)].concat([dataTable, slot]));
    }
 });

@@ -1,0 +1,45 @@
+.dg-grid {
+
+   @padding: 5px;
+
+   .dg-table {
+      width: 100%;
+      border-collapse: collapse;
+   }
+
+   .dg-head {
+      tr {
+         background: #f3f3f3;
+         color: #636363;
+      }
+
+      th {
+         border: 1px solid #d3d3d3;
+         padding: @padding;
+         font-weight: normal;
+
+         &.can-sort {
+            cursor: pointer;
+         }
+
+         .sort-direction {
+            display: inline-block;
+            width: 5px;
+            margin-right: 5px;
+            font-size: 0.8em;
+            position: relative;
+            top: -2px;
+         }
+      }
+   }
+
+   .dg-body {
+      td {
+         padding: @padding;
+      }
+   }
+
+   .dg-hidden {
+      display: none;
+   }
+}

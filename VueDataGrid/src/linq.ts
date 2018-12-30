@@ -25,6 +25,22 @@ class Enumerable<T> {
       });
    }
 
+   public all(predicate: (item: T) => boolean) {
+      for(const item of this.items()) {
+         if(!predicate(item))
+            return false;
+      }
+      return true;
+   }
+
+   public any(predicate: (item: T) => boolean) {
+      for(const item of this.items()) {
+         if(predicate(item))
+            return true;
+      }
+      return false;
+   }
+
    public firstOrDefault(predicate?: (item: T) => boolean) {
       const result = this.toList();
       if (result.length === 0)
@@ -42,4 +58,11 @@ class Enumerable<T> {
 
 export function chain<T>(items: T[]) {
    return new Enumerable(() => items);
+}
+
+export function range(start: number, count: number) {
+   const result = [];
+   for(let a=0;a<count;a++)
+      result.push(start+a);
+   return chain(result);
 }
