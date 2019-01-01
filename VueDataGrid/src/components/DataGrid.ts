@@ -1,6 +1,7 @@
 import Vue,{ VNode, VNodeComponentOptions, VNodeData } from "vue";
 import { cast } from "./Grid";
 import { IDataColumn, DataColumn } from "./DataColumn";
+import { getFormatter } from "../Config";
 import buildSource, { IDataSource, IDataRequest, ISortField, SortDirection } from "../DataSource";
 import { chain, range } from '@/linq';
 import "./DataGrid.less";
@@ -193,7 +194,7 @@ export default Vue.extend({
          const buildContent = () => {
             if(!column.template) {
                if(column.field)
-                  return data[column.field];
+                  return getFormatter(column.type)(data[column.field]);
                logError("Data column has no field and no template defined. It will be always empty.");
                return "";
             }

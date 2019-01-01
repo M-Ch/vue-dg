@@ -2,6 +2,8 @@
    <div>
       <div id="sample">
          <data-grid :page="page" :source="data" :page-size="5" :sorting="['f2', 'f3']" :sortable="canSort">
+            <data-column field="f3" name="Mapped" type="bool"></data-column>
+            <data-column field="fDate" name="Date" type="dateTime"></data-column>
             <data-column width="40%" :field="column.field" :name.sync="column.name" v-for="column in columns" :key="column.id" template="field-tpl"></data-column>
             <data-column name="Commands" template="commands-tpl" width="100px"></data-column>
             <div slot="head-off" slot-scope="column">
@@ -43,21 +45,21 @@ export default Vue.extend({
          canSort: true,
          page: 0,
          columns: [
-            { name: "a", id: 1, field: "f3" },
+            { name: "a", id: 1, field: "f2" },
             { name: "b", id: 2, field: "f2" }
          ],
          data: [
-            {f1: "a1", f2: "b1", f3: "c1" },
-            {f1: "a2", f2: "b2", f3: "c2" },
-            {f1: "a3", f2: "b3", f3: "c3" },
-            {f1: "a4", f2: "b4", f3: "c4" },
-            {f1: "a5", f2: "b5", f3: "c5" },
-            {f1: "a6", f2: "b6", f3: "c6" },
-            {f1: "a7", f2: "b7", f3: "c7" },
-            {f1: "a8", f2: "b8", f3: "c8" },
-            {f1: "a9", f2: "b9", f3: "c9" },
-            {f1: "a10", f2: "b10", f3: "c10" },
-            {f1: "a11", f2: "b11", f3: "c11" },
+            {fDate: new Date(), f1: "a1", f2: "b1", f3: true },
+            {fDate: new Date(), f1: "a2", f2: "b2", f3: false },
+            {fDate: new Date(), f1: "a3", f2: "b3", f3: true },
+            {fDate: new Date(), f1: "a4", f2: "b4", f3: true },
+            {fDate: new Date(), f1: "a5", f2: "b5", f3: false },
+            {fDate: new Date(), f1: "a6", f2: "b6", f3: false },
+            {fDate: new Date(), f1: "a7", f2: "b7", f3: true },
+            {fDate: new Date(), f1: "a8", f2: "b8", f3: true },
+            {fDate: new Date(), f1: "a9", f2: "b9", f3: true },
+            {fDate: new Date(), f1: "a10", f2: "b10", f3: true },
+            {fDate: new Date(), f1: "a11", f2: "b11", f3: true },
          ]
       };
    },

@@ -25,6 +25,28 @@ class Enumerable<T> {
       });
    }
 
+   public groupBy(keySelector: (item: T) => string) {
+    return new Enumerable<IGroup<T>>(() => {
+       const result: Array<IGroup<T>> = [];
+       const lookup: {[key: string]: T[]} = {};
+       this.items().forEach(i => {
+          const key = keySelector(i);
+          if(!lookup[key])
+            lookup[key] = [i];
+         else
+            lookup[key].push(i);
+       });
+
+       for(const key of Object.keys(lookup)) {
+          result.push({
+             key,
+             values: lookup[key]
+          });
+       }
+       return result;
+    });
+   }
+
    public all(predicate: (item: T) => boolean) {
       for(const item of this.items()) {
          if(!predicate(item))
@@ -61,6 +83,11 @@ class Enumerable<T> {
    public cast<TResult>() {
       return this as any as Enumerable<TResult>;
    }
+}
+
+export interface IGroup<TValue> {
+   key: string;
+   values: TValue[];
 }
 
 export function chain<T>(items: T[]) {

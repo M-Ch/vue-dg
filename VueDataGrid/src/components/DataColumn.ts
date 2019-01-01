@@ -7,6 +7,7 @@ export interface IDataColumn {
    template?: string;
    sortable?: boolean;
    width?: string;
+   type?: string;
 }
 
 export default Vue.extend({
@@ -16,7 +17,8 @@ export default Vue.extend({
       template: { type: String },
       field: { type: String },
       sortable: { type: Boolean, default: true },
-      width: { type: String }
+      width: { type: String },
+      type: { type: String }
    },
    render(this: Vue, h) {
       return h("div");
