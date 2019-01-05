@@ -141,24 +141,43 @@ export default Vue.extend({
       const findColumns = () => {
          const nodes = this.$slots.default;
          if(nodes === undefined)
-            return [] as IDataColumn[];
+            return [];
          return chain(nodes)
             .where(i => i.tag !== undefined && i.tag.endsWith(DataColumn))
             .select(i => i.componentOptions && i.componentOptions.propsData ? i.componentOptions.propsData : null)
             .where(i => i !== null)
             .cast<IDataColumn>()
+            .select(i => {
+               function buildLookup() {
+                  if(!i.values)
+                     return null;
+                  const lookup: {[key: string]: string} = {};
+                  i.values.forEach(j => lookup[j.key] = j.value);
+                  return lookup;
+               }
+               return {
+                  definition: i,
+                  values: buildLookup()
+               } as IColumnBinding;
+            })
             .toList();
       };
 
       const sorting: {[key: string]: SortDirection} = {};
       this.vSorting.forEach(i => sorting[i.field] = i.direction ? i.direction : SortDirection.Asc);
 
+      interface IColumnBinding {
+         definition: IDataColumn;
+         values: {[key: string]: string} | null;
+      }
+
       const columns = findColumns();
       const headTpl = this.$scopedSlots.head;
       const headerCells = columns.map(data => {
-         const title = headTpl ? headTpl(data) : data.name ? data.name : data.field;
-         const canSort = this.sortable && (data.sortable || data.sortable === undefined) && data.field;
-         const columnSorting = data.field ? sorting[data.field] : null;
+         const column = data.definition;
+         const title = headTpl ? headTpl(data) : column.name ? column.name : column.field;
+         const canSort = this.sortable && (column.sortable || column.sortable === undefined) && column.field;
+         const columnSorting = column.field ? sorting[column.field] : null;
          const content = [
             h("span",{ class: "sort-direction" }, columnSorting ? (columnSorting === "asc" ? "↑" : "↓") : ""),
             title
@@ -168,7 +187,7 @@ export default Vue.extend({
             class: canSort ? "can-sort" : null,
             on: {
                click: (e: Event) => {
-                  if(!canSort || !data.field)
+                  if(!canSort || !column.field)
                      return;
                   e.preventDefault();
                   function cycleSorting(current?: SortDirection) {
@@ -179,10 +198,10 @@ export default Vue.extend({
                         return null;
                      return SortDirection.Asc;
                   }
-                  const entry = this.vSorting.find(i => i.field === data.field);
+                  const entry = this.vSorting.find(i => i.field === column.field);
                   const newDirection = cycleSorting(entry ? entry.direction : undefined);
                   this.vSorting = newDirection
-                     ? [{field: data.field, direction: newDirection}]
+                     ? [{field: column.field, direction: newDirection}]
                      : [];
                   this.$emit("update:sorting", this.vSorting);
                }
@@ -190,13 +209,20 @@ export default Vue.extend({
             }, content);
       });
 
-      const renderCell = (data: any, column: IDataColumn) => {
+      const renderCell = (data: any, binding: IColumnBinding) => {
+         const column = binding.definition;
          const buildContent = () => {
             if(!column.template) {
-               if(column.field)
-                  return getFormatter(column.type)(data[column.field]);
-               logError("Data column has no field and no template defined. It will be always empty.");
-               return "";
+               if(!column.field) {
+                  logError("Data column has no field and no template defined. It will be always empty.");
+                  return "";
+               }
+               const rawValue = data[column.field];
+               if(binding.values) {
+                  const match = binding.values[""+rawValue];
+                  return match !== undefined ? match : ""+rawValue;
+               }
+               return getFormatter(column.type)(rawValue);
             }
 
             const tpl = this.$scopedSlots[column.template];
@@ -215,7 +241,7 @@ export default Vue.extend({
          return h("tr", cells);
       };
 
-      const cols = columns.map(i => h("col", { style: { width: i.width ? i.width : undefined } }));
+      const cols = columns.map(i => h("col", { style: { width: i.definition.width ? i.definition.width : undefined } }));
       const thead = h("thead", {class: "dg-head"}, [h("tr", {}, headerCells)]);
       const dataRows = this.vPageData.map(renderRow);
       const tbody = h("tbody", { class: "dg-body" }, dataRows);

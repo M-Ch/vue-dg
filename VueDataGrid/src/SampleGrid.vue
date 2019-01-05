@@ -2,7 +2,7 @@
    <div>
       <div id="sample">
          <data-grid :page="page" :source="data" :page-size="5" :sorting="['f2', 'f3']" :sortable="canSort">
-            <data-column field="f3" name="Mapped" type="customType"></data-column>
+            <data-column field="f3" name="Mapped" :values="[{key: true, value: 't'}]"></data-column>
             <data-column field="fDate" name="Date" type="dateTime"></data-column>
             <data-column width="40%" :field="column.field" :name.sync="column.name" v-for="column in columns" :key="column.id" template="field-tpl"></data-column>
             <data-column name="Commands" template="commands-tpl" width="100px"></data-column>
