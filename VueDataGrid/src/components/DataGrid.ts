@@ -172,16 +172,18 @@ export default Vue.extend({
       }
 
       const columns = findColumns();
-      const headTpl = this.$scopedSlots.head;
       const headerCells = columns.map(data => {
          const column = data.definition;
-         const title = headTpl ? headTpl(data) : column.name ? column.name : column.field;
+         const headTpl = column.headTemplate ? this.$scopedSlots[column.headTemplate] : null;
+         const title = headTpl ? headTpl(column) : column.name ? column.name : column.field;
          const canSort = this.sortable && (column.sortable || column.sortable === undefined) && column.field;
          const columnSorting = column.field ? sorting[column.field] : null;
          const content = [
             h("span",{ class: "sort-direction" }, columnSorting ? (columnSorting === "asc" ? "↑" : "↓") : ""),
             title
          ];
+         if(column.icon)
+            content.splice(0, 0, h("i", { class: column.icon, attrs: { "aria-hidden": true } }));
 
          return h("th", {
             class: canSort ? "can-sort" : null,
