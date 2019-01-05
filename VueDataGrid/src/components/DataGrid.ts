@@ -31,6 +31,7 @@ interface IThis extends Vue, IMethods, IData {
    sourceOptions: any;
    sorting: ISortField[];
    sortable: boolean;
+   theme: string;
 }
 
 function normalizeSorting(candidate: any): ISortField[] {
@@ -102,7 +103,8 @@ export default Vue.extend({
      sourceOptions: { default: null },
      isLoading: { type: Boolean, default: false },
      sorting: { type: Array, default: () => [] },
-     sortable: { type: Boolean, default: true }
+     sortable: { type: Boolean, default: true },
+     theme: { type: String, default: "dg-light" }
    },
    methods: cast<IMethods>({
       switchPage(this: IThis, page, forceReload) {
@@ -179,8 +181,9 @@ export default Vue.extend({
          const canSort = this.sortable && (column.sortable || column.sortable === undefined) && column.field;
          const columnSorting = column.field ? sorting[column.field] : null;
          const content = [
-            h("span",{ class: "sort-direction" }, columnSorting ? (columnSorting === "asc" ? "↑" : "↓") : ""),
-            title
+            title,
+            h("span",{ class: "sort-direction" }, columnSorting ? (columnSorting === "asc" ? "↑" : "↓") : "")
+
          ];
          if(column.icon)
             content.splice(0, 0, h("i", { class: column.icon, attrs: { "aria-hidden": true } }));
@@ -251,7 +254,7 @@ export default Vue.extend({
 
       const slot = h("div", { class: "dg-hidden" }, this.$slots.default ? this.$slots.default : []);
       return h("div", {
-         class: "dg-grid"
+         class: ["dg-grid", this.theme]
       }, [h("div", {}, "" + this.vPage)].concat([dataTable, slot]));
    }
 });
