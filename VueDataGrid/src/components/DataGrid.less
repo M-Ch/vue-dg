@@ -38,10 +38,20 @@
             margin-right: 5px;
          }
       }
+
+      .dg-page-list {
+         a {
+            text-decoration: none;
+         }
+      }
    }
 }
 
 .dg-grid.dg-light {
+
+   &, a {
+      color: #353535;
+   }
 
    .row-border() {
       border-bottom: 1px solid #eff2f7;
@@ -73,13 +83,38 @@
 
    .dg-footer {
       padding: @padding;
-      text-align: right;
+      height: 30px;
 
       .dg-pager {
+         float: right;
+
          input {
             border: 1px solid #bababa;
             border-radius: 3px;
          }
+      }
+
+      .dg-page-list {
+         float: left;
+
+         a, span {
+            margin-right: @padding;
+         }
+         
+         a:hover {
+            color: #808080
+         }
+
+         a[disabled] {
+            pointer-events: none;
+         }
+
+         span {
+            font-weight: bold;
+            font-size: 1.05em;
+            color: #4e4e4e
+         }
+
       }
    }
 

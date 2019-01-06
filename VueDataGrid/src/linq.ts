@@ -14,6 +14,16 @@ class Enumerable<T> {
       return new Enumerable<TResult>(() => this.items().map(selector));
    }
 
+   public take(count: number) {
+      return new Enumerable<T>(() => {
+         const result: T[] = [];
+         const items = this.items();
+         for(let a=0; a< count && items.length; a++)
+            result.push(items[a]);
+         return result;
+      });
+   }
+
    public where(predicate: (item: T) => boolean) {
       return new Enumerable<T>(() => {
          const result: T[] = [];

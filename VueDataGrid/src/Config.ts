@@ -12,6 +12,11 @@ export interface ILang {
    dateTimeFormat: string;
    pagerPage: string;
    pagerOfPages: string;
+   firstPage: string;
+   previousPage: string;
+   nextPage: string;
+   lastPage: string;
+   pageListItemTitle: string;
 }
 
 const types: {[key: string]: ITypeConfig } = {};
@@ -22,6 +27,11 @@ let i18n: ILang = {
    dateTimeFormat: "YYYY-MM-DD HH:mm",
    pagerPage: "Page",
    pagerOfPages: "of",
+   firstPage: "First page",
+   previousPage: "Previous page",
+   nextPage: "Next page",
+   lastPage: "Last page",
+   pageListItemTitle: "Page %page%"
 };
 
 export function setLanguage(lang: ILang) {

@@ -6,6 +6,7 @@ import buildSource, { IDataSource, IDataRequest, ISortField, SortDirection } fro
 import { chain, range } from '@/linq';
 import "./DataGrid.less";
 import Pager from "./Pager";
+import PageList from "./PageList";
 
 function logError(message: string) {
    if(!Vue.config.silent)
@@ -274,11 +275,26 @@ export default Vue.extend({
             }
          }
       });
+
+      const pageList = h("page-list", {
+         props: {
+            value: this.vPage,
+            pageSize: this.pageSize,
+            total: this.vTotal
+         },
+         on: {
+            input: (page: number) => {
+               this.switchPage(page);
+               this.$emit("update:page", page);
+            }
+         }
+      });
       return h("div", {
          class: ["dg-grid", this.theme]
-      }, [dataTable, h("div", { class: "dg-footer"}, [pager]), slot]);
+      }, [dataTable, h("div", { class: "dg-footer"}, [pageList, pager]), slot]);
    },
    components: {
-      Pager
+      Pager,
+      PageList
    }
 });
