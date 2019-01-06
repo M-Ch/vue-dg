@@ -1,7 +1,7 @@
 <template>
    <div>
       <div id="sample">
-         <data-grid :page="page" :source="data" :page-size="5" :sorting="['f2', 'f3']" :sortable="canSort">
+         <data-grid :page.sync="page" :source="data" :page-size="pageSize" :sorting="['f2', 'f3']" :sortable="canSort">
             <data-column field="f3" name="Mapped" :values="[{key: true, value: 't'}]"></data-column>
             <data-column field="fDate" name="Date" type="dateTime" head-template="head-off"></data-column>
             <data-column width="20%" :field="column.field" :name.sync="column.name" v-for="column in columns" :key="column.id" template="field-tpl"></data-column>
@@ -18,7 +18,7 @@
          </data-grid>
       </div>
       <button v-on:click="append">switch page</button>
-      <button v-on:click="canSort = !canSort">change test</button>
+      <button v-on:click="pageSize = 2">change test</button>
    </div>
 </template>
 
@@ -44,6 +44,7 @@ export default Vue.extend({
          test: "aaaaa",
          canSort: true,
          page: 0,
+         pageSize: 5,
          columns: [
             { name: "a", id: 1, field: "f2" },
             { name: "b", id: 2, field: "f2" }

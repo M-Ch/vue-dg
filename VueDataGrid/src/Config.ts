@@ -10,6 +10,8 @@ export interface ILang {
    no: string;
    dateFormat: string;
    dateTimeFormat: string;
+   pagerPage: string;
+   pagerOfPages: string;
 }
 
 const types: {[key: string]: ITypeConfig } = {};
@@ -17,7 +19,9 @@ let i18n: ILang = {
    yes: "Yes",
    no: "No",
    dateFormat: "YYYY-MM-DD",
-   dateTimeFormat: "YYYY-MM-DD HH:mm"
+   dateTimeFormat: "YYYY-MM-DD HH:mm",
+   pagerPage: "Page",
+   pagerOfPages: "of",
 };
 
 export function setLanguage(lang: ILang) {

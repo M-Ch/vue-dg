@@ -1,6 +1,7 @@
 .dg-grid {
 
    font-family: Helvetica Neue, Helvetica, sans-serif;
+   font-size: 14px;
 
    .dg-table {
       width: 100%;
@@ -24,6 +25,17 @@
          &.can-sort {
             cursor: pointer;
             user-select: none;
+         }
+      }
+   }
+
+   .dg-footer {
+      .dg-pager {
+         input {
+            padding-left: 5px;
+            padding-right: 5px;
+            margin-left: 5px;
+            margin-right: 5px;
          }
       }
    }
@@ -55,6 +67,18 @@
 
          div {
             display: inline-block;
+         }
+      }
+   }
+
+   .dg-footer {
+      padding: @padding;
+      text-align: right;
+
+      .dg-pager {
+         input {
+            border: 1px solid #bababa;
+            border-radius: 3px;
          }
       }
    }

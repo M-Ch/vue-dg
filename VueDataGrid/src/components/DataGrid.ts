@@ -5,6 +5,7 @@ import { getFormatter } from "../Config";
 import buildSource, { IDataSource, IDataRequest, ISortField, SortDirection } from "../DataSource";
 import { chain, range } from '@/linq';
 import "./DataGrid.less";
+import Pager from "./Pager";
 
 function logError(message: string) {
    if(!Vue.config.silent)
@@ -22,6 +23,7 @@ interface IData {
    vFetchId: number;
    vPageData: any[];
    vSorting: ISortField[];
+   vTotal: number;
 }
 
 interface IThis extends Vue, IMethods, IData {
@@ -59,7 +61,8 @@ export default Vue.extend({
          vFetchId: 0,
          vDataSource: buildSource(self.source, self.sourceOptions),
          vPageData: [],
-         vSorting: self.sorting ? normalizeSorting(self.sorting) : []
+         vSorting: self.sorting ? normalizeSorting(self.sorting) : [],
+         vTotal: 0
       });
    },
    mounted(this: IThis) {
@@ -68,6 +71,10 @@ export default Vue.extend({
    watch: {
       page(this: IThis) {
          this.switchPage(this.page);
+      },
+      pageSize(this: IThis, newValue: number, oldValue: number) {
+         const index = oldValue*this.vPage;
+         this.switchPage(Math.floor(index/newValue), true);
       },
       source(this: IThis) {
          this.vDataSource = buildSource(this.source, this.sourceOptions);
@@ -119,7 +126,7 @@ export default Vue.extend({
          const fetchId = this.vFetchId;
          const request: IDataRequest = {
             sorting: this.vSorting,
-            page: this.page,
+            page: this.vPage,
             pageSize: this.pageSize
          };
 
@@ -134,6 +141,7 @@ export default Vue.extend({
                if(fetchId !== this.vFetchId)
                   return;
                this.vPageData = data;
+               this.vTotal = total;
             })
             .fetch();
       }
@@ -253,8 +261,24 @@ export default Vue.extend({
       const dataTable = h("table", { class: "dg-table" }, [cols, thead, tbody]);
 
       const slot = h("div", { class: "dg-hidden" }, this.$slots.default ? this.$slots.default : []);
+      const pager = h("pager", {
+         props: {
+            value: this.vPage,
+            pageSize: this.pageSize,
+            total: this.vTotal
+         },
+         on: {
+            input: (page: number) => {
+               this.switchPage(page);
+               this.$emit("update:page", page);
+            }
+         }
+      });
       return h("div", {
          class: ["dg-grid", this.theme]
-      }, [h("div", {}, "" + this.vPage)].concat([dataTable, slot]));
+      }, [dataTable, h("div", { class: "dg-footer"}, [pager]), slot]);
+   },
+   components: {
+      Pager
    }
 });
