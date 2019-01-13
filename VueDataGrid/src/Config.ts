@@ -2,7 +2,8 @@ import { formatDate } from "./DateFormat";
 
 interface ITypeConfig {
    name: string;
-   formatter: (value: any) => string;
+   formatter?: (value: any) => string;
+   filterComponent?: string;
 }
 
 export interface ILang {
@@ -42,17 +43,34 @@ export function setLanguage(lang: ILang) {
    i18n = lang;
 }
 
-export function addType(name: string, formatter: (value: any) => string) {
+export interface ITypeDefinition {
+   formatter?: (value: any) => string;
+   filterComponent?: string;
+}
+
+export function addType(name: string, definition: ITypeDefinition) {
    types[name] = {
       name,
-      formatter
+      formatter: definition.formatter,
+      filterComponent: definition.filterComponent
    };
 }
 
 export function getFormatter(typeName: string | undefined | null): (value: any) => string {
+   function defaultFormatter(value: any) {
+      return value !== undefined || value !== null ? ""+value : "";
+   }
    if(!typeName || !types[typeName])
-      return i => i !== undefined || i !== null ? ""+i : "";
-   return types[typeName].formatter;
+      return defaultFormatter;
+   const candidate = types[typeName].formatter;
+   return candidate ? candidate : defaultFormatter;
+}
+
+export function getFilterComponent(typeName: string | undefined | null) {
+   if(!typeName || !types[typeName])
+      return null;
+   const candidate = types[typeName].filterComponent;
+   return candidate ? candidate : null;
 }
 
 type LangKey = keyof ILang;
@@ -60,26 +78,33 @@ export function localize(key: LangKey) {
    return i18n[key];
 }
 
-addType("bool", value => {
-   if(value === undefined || value === null)
-      return "";
-   return !!value ? i18n.yes : i18n.no;
+addType("bool", {
+   formatter: value => {
+      if(value === undefined || value === null)
+         return "";
+      return !!value ? i18n.yes : i18n.no;
+   },
+   filterComponent: "BoolFilter"
 });
 
-addType("date", value => {
-   if(!value)
-      return "";
-   const date = value instanceof Date
-      ? value
-      : new Date(value);
-   return formatDate(date, i18n.dateFormat);
+addType("date", {
+   formatter: value => {
+      if(!value)
+         return "";
+      const date = value instanceof Date
+         ? value
+         : new Date(value);
+      return formatDate(date, i18n.dateFormat);
+   }
 });
 
-addType("dateTime", value => {
-   if(!value)
-      return "";
-   const date = value instanceof Date
-      ? value
-      : new Date(value);
-   return formatDate(date, i18n.dateTimeFormat);
+addType("dateTime", {
+   formatter: value => {
+      if(!value)
+         return "";
+      const date = value instanceof Date
+         ? value
+         : new Date(value);
+      return formatDate(date, i18n.dateTimeFormat);
+   }
 });

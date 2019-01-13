@@ -27,7 +27,7 @@ export default Vue.extend({
       headTemplate: { type: String },
       field: { type: String },
       sortable: { type: Boolean, default: true },
-      filter: { },
+      filter: { default: true },
       width: { type: String },
       type: { type: String },
       values: { type: Array },

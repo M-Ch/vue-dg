@@ -1,7 +1,7 @@
 import Vue,{ VNode, VNodeComponentOptions, VNodeData } from "vue";
 import { cast } from "./Grid";
 import { IDataColumn, DataColumn } from "./DataColumn";
-import { getFormatter } from "../Config";
+import { getFormatter, getFilterComponent } from "../Config";
 import buildSource, * as ds from "../DataSource";
 import { chain, range } from '@/linq';
 import "./DataGrid.less";
@@ -37,6 +37,7 @@ interface IThis extends Vue, IMethods, IData {
    sourceOptions: any;
    sorting: ds.ISortField[];
    sortable: boolean;
+   filterable: boolean;
    theme: string;
    columnFilters: ds.IColumnFilter[];
 }
@@ -99,6 +100,7 @@ export default Vue.extend({
      isLoading: { type: Boolean, default: false },
      sorting: { type: Array, default: () => [] },
      sortable: { type: Boolean, default: true },
+     filterable: { type: Boolean, default: true },
      theme: { type: String, default: "dg-light" }
    },
    methods: cast<IMethods>({
@@ -173,6 +175,14 @@ export default Vue.extend({
          values: {[key: string]: string} | null;
       }
 
+      function findFilter(dataType: string | undefined, value: string | boolean | undefined) {
+         if(!value)
+            return null;
+         if(value === true)
+            return getFilterComponent(dataType);
+         return value;
+      }
+
       const columns = findColumns();
       const headerCells = columns.map(data => {
          const column = data.definition;
@@ -180,14 +190,18 @@ export default Vue.extend({
          const title = headTpl ? headTpl(column) : column.name ? column.name : column.field;
          const canSort = this.sortable && (column.sortable || column.sortable === undefined) && column.field;
          const columnSorting = column.field ? sorting[column.field] : null;
+         const filterValue = column.filter === undefined ? true : column.filter;
+         const filterComponent = this.filterable && filterValue
+            ? findFilter(column.type, filterValue)
+            : null;
          const content = [
             title,
             h("span",{ class: "sort-direction" }, columnSorting ? (columnSorting === "asc" ? "↑" : "↓") : ""),
-            column.filter && column.field ? h("FilterPopup", {
+            filterComponent && column.field ? h("FilterPopup", {
                props: {
                   value: columnFilters[column.field],
                   fieldName: column.field,
-                  filterComponent: column.filter ? column.filter : "todo: default"
+                  filterComponent
                },
                on: {
                   input: (value: ds.IFilterGroup[]) => {
