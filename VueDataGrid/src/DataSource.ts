@@ -1,3 +1,5 @@
+import { chain } from './linq';
+
 //promises by hand - for better compatibility ane less dependencies
 
 export enum FilterOperator {
@@ -6,7 +8,7 @@ export enum FilterOperator {
    GraterThanOrEqual = "gte",
    LowerThan = "lt",
    LowerThanOrEqual = "lte",
-   Not = "not",
+   NotEqals = "neq",
    In = "in"
 }
 
@@ -39,6 +41,7 @@ export interface IDataRequest {
    page: number;
    pageSize: number;
    sorting: ISortField[];
+   filters: IFilterGroup[];
 }
 
 export class DataPromise {
@@ -116,12 +119,37 @@ function odataSource(url: string): IDataSource {
    };
 }
 
+function isRowMatching(row: any, filter: IFilterValue) {
+   const value = row[filter.field];
+   if(filter.operator === FilterOperator.Equals)
+      return value === filter.value;
+   if(filter.operator === FilterOperator.NotEqals)
+      return value !== filter.value;
+   if(filter.operator === FilterOperator.GraterThanOrEqual)
+      return value >= filter.value;
+   if(filter.operator === FilterOperator.GreaterThan)
+      return value > filter.value;
+   if(filter.operator === FilterOperator.LowerThan)
+      return value < filter.value;
+   if(filter.operator === FilterOperator.LowerThanOrEqual)
+      return value <= filter.value;
+   if(filter.operator === FilterOperator.In)
+      return filter.value && filter.value.length > 0 && chain(filter.value as any[]).any(i => i === value);
+   throw {message: `Unknown filter type: ${filter.operator}` };
+}
+
 function arraySource(values: any[]): IDataSource {
    return {
       name: "array",
       load(data) {
          return new DataPromise((onSuccess, _, onAlways) => {
-            const copy = values.slice();
+            const isMatching = (row: any) => chain(data.filters)
+               .all(group => chain(group.filters).any(filter => isRowMatching(row, filter)));
+
+            const copy = data.filters.length > 0
+               ? chain(values).where(isMatching).toList()
+               : values.slice();
+
             if(data.sorting.length > 0)
                copy.sort((a, b) => {
                   for(const entry of data.sorting) {
@@ -136,7 +164,7 @@ function arraySource(values: any[]): IDataSource {
                });
 
             const result = copy.slice(data.page*data.pageSize, (data.page+1)*data.pageSize);
-            onSuccess(result, values.length);
+            onSuccess(result, copy.length);
             onAlways();
          });
       }

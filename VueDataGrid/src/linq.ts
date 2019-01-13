@@ -35,6 +35,16 @@ class Enumerable<T> {
       });
    }
 
+   public selectMany<TResult>(selector: (item: T) => TResult[]) {
+      return new Enumerable<TResult>(() => {
+         const result: TResult[] = [];
+         this.items().forEach(i => {
+            selector(i).forEach(j => result.push(j));
+         });
+         return result;
+      });
+   }
+
    public groupBy(keySelector: (item: T) => string) {
     return new Enumerable<IGroup<T>>(() => {
        const result: Array<IGroup<T>> = [];

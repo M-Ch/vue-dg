@@ -115,7 +115,8 @@ export default Vue.extend({
          const request: ds.IDataRequest = {
             sorting: this.vSorting,
             page: this.vPage,
-            pageSize: this.pageSize
+            pageSize: this.pageSize,
+            filters: chain(this.vColumnFilters).selectMany(i => i.groups).toList()
          };
 
          this.$emit("update:isLoading", true);
