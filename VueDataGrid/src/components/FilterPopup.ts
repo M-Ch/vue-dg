@@ -1,6 +1,7 @@
 import Vue from "vue";
 import { IFilterGroup, IFilterValue, FilterOperator } from "../DataSource";
 import BoolFilter from "./BoolFilter";
+import { localize } from '@/Config';
 
 interface IThis extends Vue {
    value: IFilterGroup[];
@@ -34,8 +35,15 @@ export default Vue.extend({
       };
    },
    render(this: IThis, h) {
-      return h("div", { class: "dg-column-filter" }, [
+      return h("div", {
+         class: "dg-column-filter",
+         attrs: {
+            "data-opened": this.opened,
+            "data-has-value": this.value && this.value.length > 0
+         }
+      }, [
          h("a", {
+            class: "dg-popup-link",
             attrs: { href: "#" },
             on: {
                click: (e: Event) => {
@@ -45,7 +53,7 @@ export default Vue.extend({
                   this.opened = !this.opened;
                }
             }
-         }, "filter"),
+         }, "▼"),
          this.opened ? h("div", {
             class: "dg-filter-popup",
             on: { click: (e: Event) => e.stopPropagation() }
@@ -71,7 +79,7 @@ export default Vue.extend({
                         this.opened = false;
                      }
                   }
-               }, "Accept"),
+               }, localize("filterAccept")),
                h("a", {
                   attrs: { href: "#" },
                   on: {
@@ -81,7 +89,7 @@ export default Vue.extend({
                         this.opened = false;
                      }
                   }
-               }, "Reset")
+               }, localize("filterReset"))
             ])
          ]) : null
       ]);

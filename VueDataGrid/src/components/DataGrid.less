@@ -24,6 +24,19 @@
             }
          }
       }
+
+      a.dg-popup-link {
+         transition: transform 0.1s;
+         text-decoration: none;
+         display: block;
+         font-size: 0.75em;
+      }
+
+      &[data-opened] {
+         a.dg-popup-link {
+            transform: rotate(180deg);
+         }
+      }
    }
 
    .dg-head {
@@ -67,6 +80,8 @@
    }
 
    @borderColor: #eff2f7;
+   @headerText: #909090;
+   @highlight: #4f90ce;
 
    .row-border() {
       border-bottom: 1px solid @borderColor;
@@ -81,6 +96,24 @@
          left: 0;
          background: white;
          box-shadow: 0px 0px 5px 0px rgba(0,0,0,0.62);
+      }
+
+      .dg-popup-actions {
+         a { 
+            color: @headerText; 
+            text-decoration: none;
+            font-weight: normal;
+         }
+      }
+
+      &[data-has-value] {
+         a.dg-popup-link {
+            color: @highlight;
+         }
+      }
+      a.dg-popup-link {
+         padding: 4px;
+         color: @headerText;
       }
 
       .dg-popup-actions {
@@ -103,7 +136,7 @@
       }
 
       th {
-         color: #909090;
+         color: @headerText;
          text-align: left;
          padding: @padding;
          font-weight: bold;

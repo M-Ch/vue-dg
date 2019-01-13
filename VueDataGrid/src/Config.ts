@@ -17,6 +17,8 @@ export interface ILang {
    nextPage: string;
    lastPage: string;
    pageListItemTitle: string;
+   filterAccept: string;
+   filterReset: string;
 }
 
 const types: {[key: string]: ITypeConfig } = {};
@@ -31,7 +33,9 @@ let i18n: ILang = {
    previousPage: "Previous page",
    nextPage: "Next page",
    lastPage: "Last page",
-   pageListItemTitle: "Page %page%"
+   pageListItemTitle: "Page %page%",
+   filterAccept: "Accept",
+   filterReset: "Reset"
 };
 
 export function setLanguage(lang: ILang) {
