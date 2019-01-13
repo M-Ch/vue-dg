@@ -13,6 +13,19 @@
       display: none;
    }
 
+   .dg-column-filter {
+      position: relative;
+
+      .dg-filter-popup {
+         [data-component='BoolFilter'] {
+            label {
+               display: block;
+               line-height: 1.8em;
+            }
+         }
+      }
+   }
+
    .dg-head {
       .sort-direction {
          display: inline-block;
@@ -53,8 +66,30 @@
       color: #353535;
    }
 
+   @borderColor: #eff2f7;
+
    .row-border() {
-      border-bottom: 1px solid #eff2f7;
+      border-bottom: 1px solid @borderColor;
+   }
+
+   .dg-column-filter {
+      .dg-filter-popup {
+         border: 1px solid @borderColor;
+         position: absolute;
+         top: 20px;
+         padding: @padding;
+         left: 0;
+         background: white;
+         box-shadow: 0px 0px 5px 0px rgba(0,0,0,0.62);
+      }
+
+      .dg-popup-actions {
+         border-top: 1px solid @borderColor;
+         padding: @padding;
+         padding-bottom: 0;
+
+         a { margin-right: 8px; }
+      }
    }
 
    @padding: 10px;

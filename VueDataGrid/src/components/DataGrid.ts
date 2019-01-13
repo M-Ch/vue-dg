@@ -2,11 +2,13 @@ import Vue,{ VNode, VNodeComponentOptions, VNodeData } from "vue";
 import { cast } from "./Grid";
 import { IDataColumn, DataColumn } from "./DataColumn";
 import { getFormatter } from "../Config";
-import buildSource, { IDataSource, IDataRequest, ISortField, SortDirection } from "../DataSource";
+import buildSource, * as ds from "../DataSource";
 import { chain, range } from '@/linq';
 import "./DataGrid.less";
 import Pager from "./Pager";
 import PageList from "./PageList";
+import FilterPopup from "./FilterPopup";
+import * as n from "../Normalization";
 
 function logError(message: string) {
    if(!Vue.config.silent)
@@ -20,11 +22,12 @@ interface IMethods {
 
 interface IData {
    vPage: number; //v prefix for "volatile" local state. Prefixes such as _ and $ are reserved by Vue itself.
-   vDataSource: IDataSource;
+   vDataSource: ds.IDataSource;
    vFetchId: number;
    vPageData: any[];
-   vSorting: ISortField[];
+   vSorting: ds.ISortField[];
    vTotal: number;
+   vColumnFilters: ds.IColumnFilter[];
 }
 
 interface IThis extends Vue, IMethods, IData {
@@ -32,25 +35,10 @@ interface IThis extends Vue, IMethods, IData {
    pageSize: number;
    source: any;
    sourceOptions: any;
-   sorting: ISortField[];
+   sorting: ds.ISortField[];
    sortable: boolean;
    theme: string;
-}
-
-function normalizeSorting(candidate: any): ISortField[] {
-
-   function normalizeField(field: any): ISortField {
-      if(typeof field === "string")
-         return {field, direction: SortDirection.Asc};
-      return {
-         field: field.field,
-         direction: field.direction ? field.direction : SortDirection.Asc
-      };
-   }
-
-   return Array.isArray(candidate)
-      ? candidate.map(normalizeField)
-      : [normalizeField(candidate)];
+   columnFilters: ds.IColumnFilter[];
 }
 
 export default Vue.extend({
@@ -62,8 +50,9 @@ export default Vue.extend({
          vFetchId: 0,
          vDataSource: buildSource(self.source, self.sourceOptions),
          vPageData: [],
-         vSorting: self.sorting ? normalizeSorting(self.sorting) : [],
-         vTotal: 0
+         vSorting: self.sorting ? n.normalizeSorting(self.sorting) : [],
+         vTotal: 0,
+         vColumnFilters: self.columnFilters ? self.columnFilters : []
       });
    },
    mounted(this: IThis) {
@@ -86,18 +75,16 @@ export default Vue.extend({
       vDataSource(this: IThis) {
          this.switchPage(0, true);
       },
+      vColumnFilters(this: IThis, newValue: ds.IColumnFilter[], oldValue: ds.IColumnFilter[]) {
+         if(!n.areFiltersEqual(newValue, oldValue))
+            this.switchPage(0, true);
+      },
+      columnFilters(this: IThis) {
+         this.vColumnFilters = this.columnFilters;
+      },
       sorting(this: IThis) {
-         const areEqual = (a: ISortField[], b: ISortField[]) => {
-            if(a ? !b : b) //a xor b
-               return false;
-            if(!a && !b)
-               return true;
-            if(a.length !== b.length)
-               return false;
-            return range(0, a.length).all(index => a[index].direction === b[index].direction && a[index].field === b[index].field);
-         };
-         const candidate = normalizeSorting(this.sorting);
-         if(!areEqual(this.vSorting, candidate))
+         const candidate = n.normalizeSorting(this.sorting);
+         if(!n.isSortingEqual(this.vSorting, candidate))
             this.vSorting = candidate;
       },
       vSorting(this: IThis) {
@@ -125,7 +112,7 @@ export default Vue.extend({
       fetchSource(this: IThis) {
          this.vFetchId++;
          const fetchId = this.vFetchId;
-         const request: IDataRequest = {
+         const request: ds.IDataRequest = {
             sorting: this.vSorting,
             page: this.vPage,
             pageSize: this.pageSize
@@ -174,8 +161,11 @@ export default Vue.extend({
             .toList();
       };
 
-      const sorting: {[key: string]: SortDirection} = {};
-      this.vSorting.forEach(i => sorting[i.field] = i.direction ? i.direction : SortDirection.Asc);
+      const sorting: {[key: string]: ds.SortDirection} = {};
+      this.vSorting.forEach(i => sorting[i.field] = i.direction ? i.direction : ds.SortDirection.Asc);
+
+      const columnFilters: {[key: string]: ds.IFilterGroup[]} = {};
+      this.vColumnFilters.forEach(i => columnFilters[i.field] = i.groups);
 
       interface IColumnBinding {
          definition: IDataColumn;
@@ -191,8 +181,25 @@ export default Vue.extend({
          const columnSorting = column.field ? sorting[column.field] : null;
          const content = [
             title,
-            h("span",{ class: "sort-direction" }, columnSorting ? (columnSorting === "asc" ? "↑" : "↓") : "")
-
+            h("span",{ class: "sort-direction" }, columnSorting ? (columnSorting === "asc" ? "↑" : "↓") : ""),
+            column.filter && column.field ? h("FilterPopup", {
+               props: {
+                  value: columnFilters[column.field],
+                  fieldName: column.field,
+                  filterComponent: column.filter ? column.filter : "todo: default"
+               },
+               on: {
+                  input: (value: ds.IFilterGroup[]) => {
+                     const newFilters = chain(this.vColumnFilters).where(i => i.field !== column.field).toList();
+                     newFilters.push({
+                        field: column.field as string,
+                        groups: value
+                     });
+                     this.$emit("update:columnFilters", newFilters);
+                     this.vColumnFilters = newFilters;
+                  }
+               }
+            }) : null
          ];
          if(column.icon)
             content.splice(0, 0, h("i", { class: column.icon, attrs: { "aria-hidden": true } }));
@@ -204,13 +211,13 @@ export default Vue.extend({
                   if(!canSort || !column.field)
                      return;
                   e.preventDefault();
-                  function cycleSorting(current?: SortDirection) {
+                  function cycleSorting(current?: ds.SortDirection) {
                      //asc -> desc -> null
-                     if(current === SortDirection.Asc)
-                        return SortDirection.Desc;
-                     if(current === SortDirection.Desc)
+                     if(current === ds.SortDirection.Asc)
+                        return ds.SortDirection.Desc;
+                     if(current === ds.SortDirection.Desc)
                         return null;
-                     return SortDirection.Asc;
+                     return ds.SortDirection.Asc;
                   }
                   const entry = this.vSorting.find(i => i.field === column.field);
                   const newDirection = cycleSorting(entry ? entry.direction : undefined);
@@ -295,6 +302,7 @@ export default Vue.extend({
    },
    components: {
       Pager,
-      PageList
+      PageList,
+      FilterPopup,
    }
 });

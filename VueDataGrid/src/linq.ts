@@ -65,6 +65,16 @@ class Enumerable<T> {
       return true;
    }
 
+   public zip<TSecond, TResult>(values: TSecond[], selector: (first: T, second: TSecond) => TResult) {
+      return new Enumerable<TResult>(() => {
+         const result: TResult[] = [];
+         const items = this.items();
+         for(let a=0;a<items.length;a++)
+            result.push(selector(items[a], values[a]));
+         return result;
+      });
+   }
+
    public sum(selector: (item: T) => number) {
       let result = 0;
       for(const item of this.items())

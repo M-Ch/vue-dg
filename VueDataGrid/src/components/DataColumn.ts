@@ -16,6 +16,7 @@ export interface IDataColumn {
    type?: string;
    values?: IKeyValuePair[];
    icon?: string;
+   filter?: string | boolean;
 }
 
 export default Vue.extend({
@@ -26,6 +27,7 @@ export default Vue.extend({
       headTemplate: { type: String },
       field: { type: String },
       sortable: { type: Boolean, default: true },
+      filter: { },
       width: { type: String },
       type: { type: String },
       values: { type: Array },

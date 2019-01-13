@@ -2,7 +2,7 @@
    <div>
       <div id="sample">
          <data-grid :page.sync="page" :source="data" :page-size="pageSize" :sorting="['f2', 'f3']" :sortable="canSort">
-            <data-column field="f3" name="Mapped" :values="[{key: true, value: 't'}]"></data-column>
+            <data-column field="f3" name="Mapped" :values="[{key: true, value: 't'}]" type="bool" filter="BoolFilter"></data-column>
             <data-column field="fDate" name="Date" type="dateTime" head-template="head-off"></data-column>
             <data-column width="20%" :field="column.field" :name.sync="column.name" v-for="column in columns" :key="column.id" template="field-tpl"></data-column>
             <data-column name="Commands" template="commands-tpl" width="150px" icon="fa fa-address-book"></data-column>

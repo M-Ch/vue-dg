@@ -1,5 +1,30 @@
 //promises by hand - for better compatibility ane less dependencies
 
+export enum FilterOperator {
+   Equals = "eq",
+   GreaterThan = "gt",
+   GraterThanOrEqual = "gte",
+   LowerThan = "lt",
+   LowerThanOrEqual = "lte",
+   Not = "not",
+   In = "in"
+}
+
+export interface IColumnFilter {
+   field: string;
+   groups: IFilterGroup[];
+}
+
+export interface IFilterValue {
+   value: any;
+   operator: FilterOperator;
+   field: string;
+}
+
+export interface IFilterGroup {
+   filters: IFilterValue[];
+}
+
 export enum SortDirection {
    Asc = "asc",
    Desc = "desc"
