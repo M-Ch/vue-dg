@@ -9,13 +9,16 @@ import Pager from "./Pager";
 import PageList from "./PageList";
 import FilterPopup from "./FilterPopup";
 import * as n from "../Normalization";
+import { IListener } from "./Interfaces";
+import { IDataGroup, FilterGroup } from "./FilterGroup";
+import { IDataFilter, FilterField } from "./FilterField";
 
 function logError(message: string) {
    if(!Vue.config.silent)
       console.error(message);
 }
 
-interface IMethods {
+interface IMethods extends IListener {
    switchPage: (page: number, forceReload?: boolean) => void;
    fetchSource: () => void;
 }
@@ -111,30 +114,56 @@ export default Vue.extend({
          this.$emit("update:page", page);
          this.fetchSource();
       },
+      onValueSignaled(this: IThis) {
+         //caled when data group filters have changed
+         this.switchPage(0, true);
+      },
       fetchSource(this: IThis) {
          this.vFetchId++;
          const fetchId = this.vFetchId;
-         const request: ds.IDataRequest = {
-            sorting: this.vSorting,
-            page: this.vPage,
-            pageSize: this.pageSize,
-            filters: chain(this.vColumnFilters).selectMany(i => i.groups).toList()
-         };
-
          this.$emit("update:isLoading", true);
-         this.vDataSource
-            .load(request)
-            .always(() => {
-               if(fetchId === this.vFetchId)
-                  this.$emit("update:isLoading", false);
-            })
-            .success((data, total) => {
-               if(fetchId !== this.vFetchId)
-                  return;
-               this.vPageData = data;
-               this.vTotal = total;
-            })
-            .fetch();
+         this.$nextTick(() => {
+            if(fetchId !== this.vFetchId)
+               return;
+
+            const dataGroups = chain(this.$children)
+               .where(i => i.$options.name === FilterGroup)
+               .cast<IDataGroup>()
+               .select(i => i.getValue())
+               .where(i => i.filters.length > 0)
+               .toList();
+
+            const dataFilters = chain(this.$children)
+               .where(i => i.$options.name === FilterField)
+               .cast<IDataFilter>()
+               .select(i => ({ filters: [i.getValue()] }))
+               .toList();
+
+            const request: ds.IDataRequest = {
+               sorting: this.vSorting,
+               page: this.vPage,
+               pageSize: this.pageSize,
+               filters: chain(this.vColumnFilters)
+                  .selectMany(i => i.groups)
+                  .concat(dataGroups)
+                  .concat(dataFilters)
+                  .toList()
+            };
+            console.log(request);
+            this.vDataSource
+               .load(request)
+               .always(() => {
+                  if(fetchId === this.vFetchId)
+                     this.$emit("update:isLoading", false);
+               })
+               .success((data, total) => {
+                  if(fetchId !== this.vFetchId)
+                     return;
+                  this.vPageData = data;
+                  this.vTotal = total;
+               })
+               .fetch();
+         });
       }
    }),
    render(this: IThis, h) {

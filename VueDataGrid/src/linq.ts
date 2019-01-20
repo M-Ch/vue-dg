@@ -45,6 +45,14 @@ class Enumerable<T> {
       });
    }
 
+   public concat(other: T[]) {
+      return new Enumerable<T>(() => {
+         const result = this.items();
+         result.push(...other);
+         return result;
+      });
+   }
+
    public groupBy(keySelector: (item: T) => string) {
     return new Enumerable<IGroup<T>>(() => {
        const result: Array<IGroup<T>> = [];

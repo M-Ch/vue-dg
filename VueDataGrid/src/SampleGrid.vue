@@ -15,10 +15,13 @@
             <div slot="commands-tpl" slot-scope="{row}">
                <button v-on:click="itemAction(row)">show f3 value</button>
             </div>
+            <filter-group>
+               <filter-field v-for="(item, index) in filters" :key="'k'+index" :field="item.field" :value="item.value"></filter-field>
+            </filter-group>
          </data-grid>
       </div>
       <button v-on:click="append">switch page</button>
-      <button v-on:click="pageSize = 2">change test</button>
+      <button v-on:click="filters = []">change test: {{withFilter}}</button>
    </div>
 </template>
 
@@ -43,6 +46,11 @@ export default Vue.extend({
       return {
          test: "aaaaa",
          canSort: true,
+         withFilter: true,
+         filters: [
+            { field: "f1", value: "a9" },
+            { field: "f2", value: "b5" }
+         ],
          page: 0,
          pageSize: 5,
          columns: [
