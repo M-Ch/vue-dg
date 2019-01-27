@@ -39,6 +39,27 @@ let i18n: ILang = {
    filterReset: "Reset"
 };
 
+export interface ISettings {
+   idField: string;
+}
+
+export interface ISettingsArgs {
+   idField?: string;
+}
+
+const settings: ISettings = {
+   idField: "id"
+};
+
+export function setup(values: ISettingsArgs) {
+   if(values.idField !== undefined)
+      settings.idField = values.idField;
+}
+
+export function getSettings() {
+   return settings;
+}
+
 export function setLanguage(lang: ILang) {
    i18n = lang;
 }

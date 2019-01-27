@@ -1,7 +1,7 @@
 import Vue,{ VNode, VNodeComponentOptions, VNodeData } from "vue";
 import { cast } from "./Grid";
 import { IDataColumn, DataColumn } from "./DataColumn";
-import { getFormatter, getFilterComponent } from "../Config";
+import { getFormatter, getFilterComponent, getSettings } from "../Config";
 import buildSource, * as ds from "../DataSource";
 import { chain, range } from '@/linq';
 import "./DataGrid.less";
@@ -19,7 +19,9 @@ function logError(message: string) {
 }
 
 interface IMethods extends IListener {
-   switchPage: (page: number, forceReload?: boolean) => void;
+   switchPage: (page: number, forceReload?: boolean, initialLoad?: boolean) => void;
+   updateSelection: (item: any) => void;
+   resetSelection: () => void;
    fetchSource: () => void;
 }
 
@@ -31,6 +33,13 @@ interface IData {
    vSorting: ds.ISortField[];
    vTotal: number;
    vColumnFilters: ds.IColumnFilter[];
+   vSelectedIds: any[];
+}
+
+enum SelectionMode {
+   None = "none",
+   Single = "single",
+   Multi = "multi",
 }
 
 interface IThis extends Vue, IMethods, IData {
@@ -44,6 +53,11 @@ interface IThis extends Vue, IMethods, IData {
    theme: string;
    columnFilters: ds.IColumnFilter[];
    filters: Array<ds.IFilterGroup | ds.IFilterValue> | ds.IFilterValue | ds.IFilterGroup;
+   idField: string;
+   selectedIds: any[];
+   selected: any[];
+   selectionMode: SelectionMode;
+   keepSelection: boolean;
 }
 
 export default Vue.extend({
@@ -57,11 +71,15 @@ export default Vue.extend({
          vPageData: [],
          vSorting: self.sorting ? n.normalizeSorting(self.sorting) : [],
          vTotal: 0,
-         vColumnFilters: self.columnFilters ? self.columnFilters : []
+         vColumnFilters: self.columnFilters ? self.columnFilters : [],
+         vSelectedIds: self.selectedIds ? self.selectedIds : []
       });
    },
    mounted(this: IThis) {
-      this.switchPage(this.page, true);
+      if(this.selectionMode === SelectionMode.None) {
+         this.resetSelection();
+      }
+      this.switchPage(this.page, true, true);
    },
    watch: {
       page(this: IThis) {
@@ -79,6 +97,24 @@ export default Vue.extend({
       },
       soureOptions(this: IThis) {
          this.vDataSource = buildSource(this.source, this.sourceOptions);
+      },
+      selectionMode(this: IThis) {
+         if(this.selectionMode === SelectionMode.None) {
+            this.resetSelection();
+         }
+         if(this.selectionMode === SelectionMode.Single && this.vSelectedIds.length > 1) {
+            this.vSelectedIds = [this.vSelectedIds[0]];
+            this.$emit("update:selectedIds", this.vSelectedIds);
+            this.$emit("update:selected", this.selected ? [this.selected[0]] : []);
+         }
+      },
+      selectedIds(this: IThis) {
+         if(!this.selectedIds) {
+            this.vSelectedIds = [];
+            return;
+         }
+         if(this.vSelectedIds.length !== this.selectedIds.length || !chain(this.vSelectedIds).zip(this.selectedIds, (a,b) => a === b).any(i => !i))
+            this.vSelectedIds = this.selectedIds;
       },
       vDataSource(this: IThis) {
          this.switchPage(0, true);
@@ -105,16 +141,23 @@ export default Vue.extend({
      source: { default: null },
      sourceOptions: { default: null },
      isLoading: { type: Boolean, default: false },
+     idField: { type: String, default: getSettings().idField },
      sorting: { type: Array, default: () => [] },
+     selectedIds: { type: Array, default: () => [] },
+     selected: { type: Array, default: () => [] },
+     selectionMode: { type: String, default: SelectionMode.None },
      sortable: { type: Boolean, default: true },
      filterable: { type: Boolean, default: true },
+     keepSelection: { type: Boolean, default: false },
      filters: {},
      theme: { type: String, default: "dg-light" }
    },
    methods: cast<IMethods>({
-      switchPage(this: IThis, page, forceReload) {
+      switchPage(this: IThis, page, forceReload, initialLoad?) {
          if (this.vPage === page && !forceReload)
             return;
+         if(!initialLoad && !this.keepSelection)
+            this.resetSelection();
          this.vPage = page;
          this.$emit("update:page", page);
          this.fetchSource();
@@ -122,6 +165,40 @@ export default Vue.extend({
       onValueSignaled(this: IThis) {
          //caled when data group filters have changed
          this.switchPage(0, true);
+      },
+      updateSelection(this: IThis, item: any) {
+         const id = item[this.idField];
+         if(id === undefined) {
+            logError(`Data item does not have ${this.idField} property specified as id.`);
+            return;
+         }
+         if(this.vSelectedIds.findIndex(i => i === id) >= 0) {
+            //deselect
+            this.vSelectedIds = this.vSelectedIds.filter(i => i !== id);
+            this.$emit("update:selectedIds", this.vSelectedIds);
+            this.$emit("update:selected", this.selected ? this.selected.filter(i => i[this.idField] !== id) : []);
+            return;
+         }
+
+         if(this.selectionMode === SelectionMode.Single) {
+            this.vSelectedIds = [id];
+            this.$emit("update:selectedIds", this.vSelectedIds);
+            this.$emit("update:selected", [item]);
+            return;
+         }
+         if(this.selectionMode === SelectionMode.Multi) {
+            this.vSelectedIds = this.vSelectedIds.concat([id]);
+            this.$emit("update:selectedIds", this.vSelectedIds);
+            this.$emit("update:selected", this.selected ? this.selected.concat([item]) : [item]);
+            return;
+         }
+
+         logError(`Unknown selection mode selected: ${this.selectionMode}.`);
+      },
+      resetSelection(this: IThis) {
+         this.vSelectedIds = [];
+         this.$emit("update:selectedIds", []);
+         this.$emit("update:selected", []);
       },
       fetchSource(this: IThis) {
          this.vFetchId++;
@@ -323,9 +400,25 @@ export default Vue.extend({
          return h("td", [buildContent()]);
       };
 
+      const selected: {[key: string]: boolean} = {};
+      this.vSelectedIds.forEach(i => {
+         selected[""+i] = true;
+      });
+
       const renderRow = (data: any) => {
          const cells = columns.map(i => renderCell(data, i));
-         return h("tr", cells);
+         return h("tr", {
+            class: selected[data[this.idField]] ? "dg-selected" : null,
+            on: {
+               click: (e: Event) => {
+                  if(this.selectionMode === SelectionMode.None)
+                     return;
+                  e.preventDefault();
+                  e.stopPropagation();
+                  this.updateSelection(data);
+               }
+            }
+          }, cells);
       };
 
       const cols = columns.map(i => h("col", { style: { width: i.definition.width ? i.definition.width : undefined } }));
