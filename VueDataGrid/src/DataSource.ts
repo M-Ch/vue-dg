@@ -19,7 +19,7 @@ export interface IColumnFilter {
 
 export interface IFilterValue {
    value: any;
-   operator: FilterOperator;
+   operator?: FilterOperator;
    field: string;
 }
 
@@ -119,23 +119,28 @@ function odataSource(url: string): IDataSource {
    };
 }
 
+function operatorOrDefault(operator: FilterOperator | undefined) {
+   return operator !== undefined ? operator : FilterOperator.Equals;
+}
+
 function isRowMatching(row: any, filter: IFilterValue) {
    const value = row[filter.field];
-   if(filter.operator === FilterOperator.Equals)
+   const operator = operatorOrDefault(filter.operator);
+   if(operator === FilterOperator.Equals)
       return value === filter.value;
-   if(filter.operator === FilterOperator.NotEqals)
+   if(operator === FilterOperator.NotEqals)
       return value !== filter.value;
-   if(filter.operator === FilterOperator.GraterThanOrEqual)
+   if(operator === FilterOperator.GraterThanOrEqual)
       return value >= filter.value;
-   if(filter.operator === FilterOperator.GreaterThan)
+   if(operator === FilterOperator.GreaterThan)
       return value > filter.value;
-   if(filter.operator === FilterOperator.LowerThan)
+   if(operator === FilterOperator.LowerThan)
       return value < filter.value;
-   if(filter.operator === FilterOperator.LowerThanOrEqual)
+   if(operator === FilterOperator.LowerThanOrEqual)
       return value <= filter.value;
-   if(filter.operator === FilterOperator.In)
+   if(operator === FilterOperator.In)
       return filter.value && filter.value.length > 0 && chain(filter.value as any[]).any(i => i === value);
-   throw {message: `Unknown filter type: ${filter.operator}` };
+   throw {message: `Unknown filter type: ${operator}` };
 }
 
 function arraySource(values: any[]): IDataSource {

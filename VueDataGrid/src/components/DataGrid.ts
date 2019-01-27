@@ -43,6 +43,7 @@ interface IThis extends Vue, IMethods, IData {
    filterable: boolean;
    theme: string;
    columnFilters: ds.IColumnFilter[];
+   filters: Array<ds.IFilterGroup | ds.IFilterValue> | ds.IFilterValue | ds.IFilterGroup;
 }
 
 export default Vue.extend({
@@ -64,6 +65,9 @@ export default Vue.extend({
    },
    watch: {
       page(this: IThis) {
+         this.switchPage(this.page);
+      },
+      filters(this: IThis) {
          this.switchPage(this.page);
       },
       pageSize(this: IThis, newValue: number, oldValue: number) {
@@ -104,6 +108,7 @@ export default Vue.extend({
      sorting: { type: Array, default: () => [] },
      sortable: { type: Boolean, default: true },
      filterable: { type: Boolean, default: true },
+     filters: {},
      theme: { type: String, default: "dg-light" }
    },
    methods: cast<IMethods>({
@@ -126,6 +131,22 @@ export default Vue.extend({
             if(fetchId !== this.vFetchId)
                return;
 
+            const externalFilters = () => {
+               if(!this.filters)
+                  return [];
+
+               function normalize(value: ds.IFilterValue | ds.IFilterGroup): ds.IFilterGroup {
+                  if("filters" in value)
+                     return value;
+                  return {
+                     filters: [ value ]
+                  };
+               }
+               return Array.isArray(this.filters)
+                  ? this.filters.map(normalize)
+                  : [ normalize(this.filters) ];
+            };
+
             const dataGroups = chain(this.$children)
                .where(i => i.$options.name === FilterGroup)
                .cast<IDataGroup>()
@@ -147,6 +168,7 @@ export default Vue.extend({
                   .selectMany(i => i.groups)
                   .concat(dataGroups)
                   .concat(dataFilters)
+                  .concat(externalFilters())
                   .toList()
             };
             console.log(request);

@@ -1,6 +1,7 @@
 <template>
    <div>
       <div id="sample">
+         <!-- :filters="{filters: [{field: 'f2', value: 'b3'}, {field: 'f2', value: 'b4'}]}" -->
          <data-grid :page.sync="page" :source="data" :page-size="pageSize" :sorting="['f2', 'f3']" :sortable="canSort">
             <data-column field="f3" name="Mapped" :values="[{key: true, value: 't'}]" type="bool"></data-column>
             <data-column field="fDate" name="Date" type="dateTime" head-template="head-off" :filter="true"></data-column>
@@ -15,9 +16,9 @@
             <div slot="commands-tpl" slot-scope="{row}">
                <button v-on:click="itemAction(row)">show f3 value</button>
             </div>
-            <filter-group>
+            <!--<filter-group>
                <filter-field v-for="(item, index) in filters" :key="'k'+index" :field="item.field" :value="item.value"></filter-field>
-            </filter-group>
+            </filter-group>-->
          </data-grid>
       </div>
       <button v-on:click="append">switch page</button>
