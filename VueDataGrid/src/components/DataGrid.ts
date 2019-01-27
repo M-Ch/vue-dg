@@ -8,6 +8,7 @@ import "./DataGrid.less";
 import Pager from "./Pager";
 import PageList from "./PageList";
 import FilterPopup from "./FilterPopup";
+import TriCheckbox from "./TriCheckbox";
 import * as n from "../Normalization";
 import { IListener } from "./Interfaces";
 import { IDataGroup, FilterGroup } from "./FilterGroup";
@@ -22,6 +23,7 @@ interface IMethods extends IListener {
    switchPage: (page: number, forceReload?: boolean, initialLoad?: boolean) => void;
    updateSelection: (item: any) => void;
    resetSelection: () => void;
+   selectAll: () => void;
    fetchSource: () => void;
 }
 
@@ -57,6 +59,7 @@ interface IThis extends Vue, IMethods, IData {
    selectedIds: any[];
    selected: any[];
    selectionMode: SelectionMode;
+   checkboxes: boolean;
    keepSelection: boolean;
 }
 
@@ -149,6 +152,7 @@ export default Vue.extend({
      sortable: { type: Boolean, default: true },
      filterable: { type: Boolean, default: true },
      keepSelection: { type: Boolean, default: false },
+     checkboxes: { type: Boolean, default: true },
      filters: {},
      theme: { type: String, default: "dg-light" }
    },
@@ -165,6 +169,22 @@ export default Vue.extend({
       onValueSignaled(this: IThis) {
          //caled when data group filters have changed
          this.switchPage(0, true);
+      },
+      selectAll(this: IThis) {
+         if(!this.keepSelection) {
+            this.vSelectedIds = this.vPageData.map(i => i[this.idField]);
+            this.$emit("update:selectedIds", this.vSelectedIds);
+            this.$emit("update:selected", this.vPageData);
+         }
+
+         const selected: {[key: string]: boolean} = {};
+         this.vSelectedIds.forEach(i => {
+            selected[""+i] = true;
+         });
+         const toAdd = this.vPageData.filter(i => !selected[i[this.idField]]);
+         this.vSelectedIds = this.vSelectedIds.slice().concat(toAdd.map(i => i[this.idField]));
+         this.$emit("update:selectedIds", this.vSelectedIds);
+         this.$emit("update:selected", this.selected ? this.selected.slice().concat(toAdd) : toAdd);
       },
       updateSelection(this: IThis, item: any) {
          const id = item[this.idField];
@@ -187,9 +207,9 @@ export default Vue.extend({
             return;
          }
          if(this.selectionMode === SelectionMode.Multi) {
-            this.vSelectedIds = this.vSelectedIds.concat([id]);
+            this.vSelectedIds = this.vSelectedIds.slice().concat([id]);
             this.$emit("update:selectedIds", this.vSelectedIds);
-            this.$emit("update:selected", this.selected ? this.selected.concat([item]) : [item]);
+            this.$emit("update:selected", this.selected ? this.selected.slice().concat([item]) : [item]);
             return;
          }
 
@@ -311,6 +331,7 @@ export default Vue.extend({
          return value;
       }
 
+      const hasCheckboxes = this.selectionMode === SelectionMode.Multi && this.checkboxes;
       const columns = findColumns();
       const headerCells = columns.map(data => {
          const column = data.definition;
@@ -373,6 +394,32 @@ export default Vue.extend({
             }, content);
       });
 
+      const selected: {[key: string]: boolean} = {};
+      this.vSelectedIds.forEach(i => {
+         selected[""+i] = true;
+      });
+
+      if(hasCheckboxes)
+         headerCells.splice(0, 0, h("th", { class: "dg-selector" }, [
+            h("TriCheckbox", {
+               props: {
+                  value: this.vSelectedIds.length === 0
+                     ? false
+                     : (this.keepSelection ? this.vTotal : this.vPageData.length) === this.vSelectedIds.length && chain(this.vPageData).all(i => selected[i[this.idField]])
+                        ? true
+                        : null
+               },
+               on: {
+                  input: (value: boolean) => {
+                     if(value)
+                        this.selectAll();
+                     else
+                        this.resetSelection();
+                  }
+               }
+            })
+         ]));
+
       const renderCell = (data: any, binding: IColumnBinding) => {
          const column = binding.definition;
          const buildContent = () => {
@@ -400,13 +447,18 @@ export default Vue.extend({
          return h("td", [buildContent()]);
       };
 
-      const selected: {[key: string]: boolean} = {};
-      this.vSelectedIds.forEach(i => {
-         selected[""+i] = true;
-      });
-
       const renderRow = (data: any) => {
          const cells = columns.map(i => renderCell(data, i));
+         if(hasCheckboxes) {
+            cells.splice(0, 0, h("td", { class: "dg-selector" }, [
+               h("TriCheckbox", {
+                  props: { value: !!selected[data[this.idField]] },
+                  on: {
+                     input: () => this.updateSelection(data)
+                  }
+               })
+            ]));
+         }
          return h("tr", {
             class: selected[data[this.idField]] ? "dg-selected" : null,
             on: {
@@ -463,5 +515,6 @@ export default Vue.extend({
       Pager,
       PageList,
       FilterPopup,
+      TriCheckbox
    }
 });
