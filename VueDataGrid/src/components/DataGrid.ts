@@ -53,6 +53,7 @@ interface IThis extends Vue, IMethods, IData {
    sourceOptions: any;
    sorting: ds.ISortField[];
    sortable: boolean;
+   canReload: boolean;
    filterable: boolean;
    theme: string;
    columnFilters: ds.IColumnFilter[];
@@ -158,6 +159,7 @@ export default Vue.extend({
      filterable: { type: Boolean, default: true },
      keepSelection: { type: Boolean, default: false },
      checkboxes: { type: Boolean, default: true },
+     canReload: { type: Boolean, default: true },
      filters: {},
      detailsTemplate: { default: null },
      theme: { type: String, default: "dg-light" }
@@ -564,9 +566,24 @@ export default Vue.extend({
             }
          }
       });
+      const reloadLink = h("a", {
+         class: "dg-reload",
+         attrs: { href: "#" },
+         on: {
+            click: (e: Event) => {
+               e.preventDefault();
+               this.switchPage(this.vPage, true);
+            }
+         }
+      }, [h("i", { class: "icon-arrows-cw" })]);
       return h("div", {
          class: ["dg-grid", this.theme, this.vIsLoading ? "dg-loading" : null]
-      }, [dataTable, h("div", { class: "dg-footer"}, [pageList, pager]),  this.vIsLoading ? h("div", { class: "dg-loader"}) : null, slot]);
+      }, [
+         dataTable,
+         h("div", { class: "dg-footer"}, [this.canReload ? reloadLink : null, pageList, pager]),
+         this.vIsLoading ? h("div", { class: "dg-loader"}) : null,
+         slot
+      ]);
    },
    components: {
       Pager,
