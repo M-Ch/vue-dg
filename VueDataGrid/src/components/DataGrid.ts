@@ -37,6 +37,7 @@ interface IData {
    vColumnFilters: ds.IColumnFilter[];
    vSelectedIds: any[];
    vExpanded: {[id: string]: boolean };
+   vIsLoading: boolean;
 }
 
 enum SelectionMode {
@@ -78,7 +79,8 @@ export default Vue.extend({
          vTotal: 0,
          vColumnFilters: self.columnFilters ? self.columnFilters : [],
          vSelectedIds: self.selectedIds ? self.selectedIds : [],
-         vExpanded: {}
+         vExpanded: {},
+         vIsLoading: false
       });
    },
    mounted(this: IThis) {
@@ -228,6 +230,8 @@ export default Vue.extend({
          this.vFetchId++;
          const fetchId = this.vFetchId;
          this.$emit("update:isLoading", true);
+         this.vIsLoading = true;
+
          this.$nextTick(() => {
             if(fetchId !== this.vFetchId)
                return;
@@ -275,8 +279,10 @@ export default Vue.extend({
             this.vDataSource
                .load(request)
                .always(() => {
-                  if(fetchId === this.vFetchId)
-                     this.$emit("update:isLoading", false);
+                  if(fetchId !== this.vFetchId)
+                     return;
+                  this.$emit("update:isLoading", false);
+                  this.vIsLoading = false;
                })
                .success((data, total) => {
                   if(fetchId !== this.vFetchId)
@@ -559,8 +565,8 @@ export default Vue.extend({
          }
       });
       return h("div", {
-         class: ["dg-grid", this.theme]
-      }, [dataTable, h("div", { class: "dg-footer"}, [pageList, pager]), slot]);
+         class: ["dg-grid", this.theme, this.vIsLoading ? "dg-loading" : null]
+      }, [dataTable, h("div", { class: "dg-footer"}, [pageList, pager]),  this.vIsLoading ? h("div", { class: "dg-loader"}) : null, slot]);
    },
    components: {
       Pager,

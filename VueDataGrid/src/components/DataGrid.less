@@ -2,6 +2,7 @@
 
    font-family: Helvetica Neue, Helvetica, sans-serif;
    font-size: 14px;
+   position: relative;
 
    .dg-table {
       width: 100%;
@@ -91,6 +92,25 @@
          }
       }
    }
+
+   @keyframes loaderAnimation {
+      0% { left: 0 }
+      100% { left: 50 }
+   }
+
+   .dg-loader {
+      width: 30%;
+      max-width: 20px;
+      height: 2px;
+      position: absolute;
+      top: 0;
+      left: 0;
+      animation-name: loaderAnimation;
+      animation-duration: 0.5s;
+      animation-iteration-count: infinite;
+      animation-direction: alternate;
+      animation-timing-function: ease-in-out;
+   }
 }
 
 .dg-grid.dg-light {
@@ -102,6 +122,10 @@
    @borderColor: #eff2f7;
    @headerText: #909090;
    @highlight: #4f90ce;
+
+   .dg-loader {
+      background: @headerText;
+   }
 
    .dg-details a {
       color: @headerText;
