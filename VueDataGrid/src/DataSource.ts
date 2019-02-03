@@ -9,7 +9,8 @@ export enum FilterOperator {
    LowerThan = "lt",
    LowerThanOrEqual = "lte",
    NotEqals = "neq",
-   In = "in"
+   In = "in",
+   Contains = "substr"
 }
 
 export interface IColumnFilter {
@@ -110,12 +111,16 @@ export function addRemoteSource(name: string, factory: (baseUrl: string, request
          const xhr = new XMLHttpRequest();
          xhr.onreadystatechange = () => {
             onAlways();
-            if(xhr.readyState === XMLHttpRequest.DONE) {
-               const raw = JSON.parse(xhr.responseText);
-               const result = selector ? selector(raw) : raw as IDataPage;
-               onSuccess(result.items, result.total, urlSet.dataUrl, urlSet.pageUrl);
-            } else
+            if(xhr.readyState !== XMLHttpRequest.DONE)
+               return;
+            if(xhr.status < 200 || xhr.status >= 300) {
                onError(xhr.status);
+               return;
+            }
+
+            const raw = JSON.parse(xhr.responseText);
+            const result = selector ? selector(raw) : raw as IDataPage;
+            onSuccess(result.items, result.total, urlSet.dataUrl, urlSet.pageUrl);
          };
          xhr.open("GET", urlSet.pageUrl);
          xhrHooks.forEach(i => i(xhr));
@@ -153,7 +158,7 @@ function emptySource(): IDataSource {
    };
 }
 
-function operatorOrDefault(operator: FilterOperator | undefined) {
+export function operatorOrDefault(operator: FilterOperator | undefined) {
    return operator !== undefined ? operator : FilterOperator.Equals;
 }
 

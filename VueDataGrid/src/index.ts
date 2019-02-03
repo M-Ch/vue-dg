@@ -5,6 +5,7 @@ import FilterGroup from "./components/FilterGroup";
 import FilterField from "./components/FilterField";
 import { addType, setLanguage } from "./Config";
 import { addSource, addRemoteSource, addXhrHook } from "./DataSource";
+import { mapData, buildUrl } from "./OData";
 
 const components: {[key: string]: VueConstructor} = {
    DataGrid,
@@ -23,5 +24,7 @@ const plugin = {
    addXhrHook,
    setLanguage
 };
+
+addRemoteSource("odata", buildUrl, mapData);
 
 export default plugin;

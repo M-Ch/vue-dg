@@ -286,9 +286,16 @@ export default Vue.extend({
                   if(fetchId !== this.vFetchId)
                      return;
                   this.$emit("update:isLoading", false);
+                  this.vExpanded = {};
                   this.vIsLoading = false;
                })
-               .error((error) => logError(`Unable to load grid page. Data source error: ${error}.`))
+               .error((error) => {
+                   logError(`Unable to load grid page. Data source error: ${error}.`)
+                   this.vPageData = [];
+                   this.$emit("update:uri", null);
+                   this.$emit("update:pageUri", null);
+                   this.vTotal = 0;
+               })
                .success((data, total, uri, pageUri) => {
                   if(fetchId !== this.vFetchId)
                      return;
@@ -584,10 +591,10 @@ export default Vue.extend({
       return h("div", {
          class: ["dg-grid", this.theme, this.vIsLoading ? "dg-loading" : null]
       }, [
+         slot,
          dataTable,
          h("div", { class: "dg-footer"}, [this.canReload ? reloadLink : null, pageList, pager]),
          this.vIsLoading ? h("div", { class: "dg-loader"}) : null,
-         slot
       ]);
    },
    components: {
