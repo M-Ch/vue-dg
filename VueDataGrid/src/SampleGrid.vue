@@ -5,7 +5,9 @@
          <data-grid 
             id-field="f1" 
             details-template="details-tpl"
-            selection-mode="none" 
+            selection-mode="none"
+            :uri.sync="dataUri"
+            :page-uri.sync="dataPage"
             :keep-selection="false" 
             :page.sync="page" 
             :source="data" 
@@ -36,6 +38,8 @@
       </div>
       <button v-on:click="append">switch page</button>
       <button v-on:click="filters = []">change test: {{withFilter}}</button>
+      <div>{{dataUri}}</div>
+      <div>{{dataPage}}</div>
    </div>
 </template>
 
@@ -59,6 +63,8 @@ export default Vue.extend({
    data() {
       return {
          test: "aaaaa",
+         dataUri: null,
+         dataPage: null,
          canSort: true,
          withFilter: true,
          selected: [],

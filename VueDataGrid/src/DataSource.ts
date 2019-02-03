@@ -46,16 +46,16 @@ export interface IDataRequest {
 
 export class DataPromise {
 
-   private onSuccess: (data: any[], total: number) => void = () => {};
+   private onSuccess: (data: any[], total: number, uri: string, pageUri: string) => void = () => {};
    private onError: (error?: any) => void = () => {};
    private onAlways: () => void = () => {};
-   private resolver: (onSuccess: (data: any[], total: number) => void, onError: (error?: any) => void, onAlways: () => void) => void;
+   private resolver: (onSuccess: (data: any[], total: number, uri: string, pageUri: string) => void, onError: (error?: any) => void, onAlways: () => void) => void;
 
-   public constructor(resolver: (onSuccess: (data: any[], total: number) => void, onError: (error?: any) => void, onAlways: () => void) => void) {
+   public constructor(resolver: (onSuccess: (data: any[], total: number, uri: string, pageUri: string) => void, onError: (error?: any) => void, onAlways: () => void) => void) {
       this.resolver = resolver;
    }
 
-   public success(callback: (data: any[], total: number) => void) {
+   public success(callback: (data: any[], total: number, uri: string, pageUri: string) => void) {
       this.onSuccess = callback;
       return this;
    }
@@ -80,14 +80,59 @@ export interface IDataSource {
    name: string;
 }
 
+const sources: {[type: string]: (source: string) => IDataSource} = {};
+
+export function addSource(name: string, factory: (source: string) => IDataSource): void {
+   sources[name] = factory;
+}
+
+export interface IUrlSet {
+   dataUrl: string;
+   pageUrl: string;
+}
+
+export interface IDataPage {
+   items: any[];
+   total: number;
+}
+
+const xhrHooks: Array<(xhr: XMLHttpRequest) => void> = [];
+export function addXhrHook(hook: (xhr: XMLHttpRequest) => void) {
+   if(hook)
+      xhrHooks.push(hook);
+}
+
+export function addRemoteSource(name: string, factory: (baseUrl: string, request: IDataRequest) => IUrlSet, selector: (result: any) => IDataPage) {
+   sources[name] = (url: string) => ({
+      name,
+      load: (request) => new DataPromise((onSuccess, onError, onAlways) => {
+         const urlSet = factory(url, request);
+         const xhr = new XMLHttpRequest();
+         xhr.onreadystatechange = () => {
+            onAlways();
+            if(xhr.readyState === XMLHttpRequest.DONE) {
+               const raw = JSON.parse(xhr.responseText);
+               const result = selector ? selector(raw) : raw as IDataPage;
+               onSuccess(result.items, result.total, urlSet.dataUrl, urlSet.pageUrl);
+            } else
+               onError(xhr.status);
+         };
+         xhr.open("GET", urlSet.pageUrl);
+         xhrHooks.forEach(i => i(xhr));
+         xhr.send();
+      })
+   });
+}
+
 export default function(source: any, sourceOptions: any) {
    if(!source)
       return emptySource();
 
    if(typeof source === "string") {
-      if(sourceOptions === "odata")
-         return odataSource(source);
-      throw { error: "Source options must be set to odata (other options to be implemented)." };
+      const builder = sources[sourceOptions];
+      if(builder)
+         return builder(source);
+      throw { error: `Not supported data source type: ${sourceOptions}.` };
    }
    if(Array.isArray(source)) {
       return arraySource(source);
@@ -101,19 +146,8 @@ function emptySource(): IDataSource {
       name: "empty",
       load() {
          return new DataPromise((onSuccess, _, onAlways) => {
-            onSuccess([], 0);
+            onSuccess([], 0, "no-data", "no-data");
             onAlways();
-         });
-      }
-   };
-}
-
-function odataSource(url: string): IDataSource {
-   return {
-      name: "odata",
-      load(data) {
-         return new DataPromise((onSuccess, onError) => {
-            //todo
          });
       }
    };
@@ -169,7 +203,7 @@ function arraySource(values: any[]): IDataSource {
                });
 
             const result = copy.slice(data.page*data.pageSize, (data.page+1)*data.pageSize);
-            onSuccess(result, copy.length);
+            onSuccess(result, copy.length, "local", "local");
             onAlways();
          });
       }

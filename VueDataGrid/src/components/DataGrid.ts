@@ -160,6 +160,8 @@ export default Vue.extend({
      keepSelection: { type: Boolean, default: false },
      checkboxes: { type: Boolean, default: true },
      canReload: { type: Boolean, default: true },
+     uri: { type: String, default: null },
+     pageUri: { type: String, default: null },
      filters: {},
      detailsTemplate: { default: null },
      theme: { type: String, default: "dg-light" }
@@ -286,12 +288,15 @@ export default Vue.extend({
                   this.$emit("update:isLoading", false);
                   this.vIsLoading = false;
                })
-               .success((data, total) => {
+               .error((error) => logError(`Unable to load grid page. Data source error: ${error}.`))
+               .success((data, total, uri, pageUri) => {
                   if(fetchId !== this.vFetchId)
                      return;
                   this.vExpanded = {};
                   this.vPageData = data;
                   this.vTotal = total;
+                  this.$emit("update:uri", uri);
+                  this.$emit("update:pageUri", pageUri);
                })
                .fetch();
          });
