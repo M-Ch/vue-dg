@@ -13,6 +13,22 @@
       }
    }
 
+   .dg-details { 
+      width: 10px; 
+
+      a {
+         text-decoration: none;
+         display: inline-block;
+         font-size: 0.8em;
+         transform: rotate(90deg);
+         transition: transform .05s ease;
+
+         &.dg-expanded {
+            transform: rotate(180deg);
+         }
+      }
+   }
+
    .dg-hidden {
       display: none;
    }
@@ -86,6 +102,10 @@
    @borderColor: #eff2f7;
    @headerText: #909090;
    @highlight: #4f90ce;
+
+   .dg-details a {
+      color: @headerText;
+   }
 
    .row-border() {
       border-bottom: 1px solid @borderColor;
@@ -206,12 +226,16 @@
          &.dg-selected:hover {
             background-color: #ecf2fa;
          }
+
+         &.dg-details-row {
+            td { padding-left: 2*@padding;
+            }
+         }
       }
 
       td {
          padding: @padding;
          .row-border();
-
       }
    }
 }

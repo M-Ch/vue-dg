@@ -1,4 +1,4 @@
-import Vue,{ VNode, VNodeComponentOptions, VNodeData } from "vue";
+import Vue,{ VNode, VNodeComponentOptions, VNodeData, CreateElement } from "vue";
 import { cast } from "./Grid";
 import { IDataColumn, DataColumn } from "./DataColumn";
 import { getFormatter, getFilterComponent, getSettings } from "../Config";
@@ -36,6 +36,7 @@ interface IData {
    vTotal: number;
    vColumnFilters: ds.IColumnFilter[];
    vSelectedIds: any[];
+   vExpanded: {[id: string]: boolean };
 }
 
 enum SelectionMode {
@@ -55,6 +56,7 @@ interface IThis extends Vue, IMethods, IData {
    theme: string;
    columnFilters: ds.IColumnFilter[];
    filters: Array<ds.IFilterGroup | ds.IFilterValue> | ds.IFilterValue | ds.IFilterGroup;
+   detailsTemplate: string | ((item: any, h: CreateElement) => string | VNode);
    idField: string;
    selectedIds: any[];
    selected: any[];
@@ -75,7 +77,8 @@ export default Vue.extend({
          vSorting: self.sorting ? n.normalizeSorting(self.sorting) : [],
          vTotal: 0,
          vColumnFilters: self.columnFilters ? self.columnFilters : [],
-         vSelectedIds: self.selectedIds ? self.selectedIds : []
+         vSelectedIds: self.selectedIds ? self.selectedIds : [],
+         vExpanded: {}
       });
    },
    mounted(this: IThis) {
@@ -154,6 +157,7 @@ export default Vue.extend({
      keepSelection: { type: Boolean, default: false },
      checkboxes: { type: Boolean, default: true },
      filters: {},
+     detailsTemplate: { default: null },
      theme: { type: String, default: "dg-light" }
    },
    methods: cast<IMethods>({
@@ -268,7 +272,6 @@ export default Vue.extend({
                   .concat(externalFilters())
                   .toList()
             };
-            console.log(request);
             this.vDataSource
                .load(request)
                .always(() => {
@@ -278,6 +281,7 @@ export default Vue.extend({
                .success((data, total) => {
                   if(fetchId !== this.vFetchId)
                      return;
+                  this.vExpanded = {};
                   this.vPageData = data;
                   this.vTotal = total;
                })
@@ -399,6 +403,11 @@ export default Vue.extend({
          selected[""+i] = true;
       });
 
+      const hasDetails = !!this.detailsTemplate;
+
+      if(hasDetails)
+         headerCells.splice(0, 0, h("th", { class: "dg-details" }));
+
       if(hasCheckboxes)
          headerCells.splice(0, 0, h("th", { class: "dg-selector" }, [
             h("TriCheckbox", {
@@ -449,7 +458,24 @@ export default Vue.extend({
 
       const renderRow = (data: any) => {
          const cells = columns.map(i => renderCell(data, i));
-         if(hasCheckboxes) {
+         if(hasDetails)
+            cells.splice(0, 0, h("td", { class: "dg-details" }, [
+               h("a", {
+                  attrs: {
+                     href: "#",
+                     class: this.vExpanded[data[this.idField]] ? "dg-expanded" : null
+                  },
+                  on: {
+                     click: (e: Event) => {
+                        e.preventDefault();
+                        this.vExpanded[data[this.idField]] = !this.vExpanded[data[this.idField]];
+                        this.$forceUpdate();
+                     }
+                  }
+               }, '▲')
+            ]));
+
+         if(hasCheckboxes)
             cells.splice(0, 0, h("td", { class: "dg-selector" }, [
                h("TriCheckbox", {
                   props: { value: !!selected[data[this.idField]] },
@@ -458,8 +484,8 @@ export default Vue.extend({
                   }
                })
             ]));
-         }
-         return h("tr", {
+
+         const rows = [h("tr", {
             class: selected[data[this.idField]] ? "dg-selected" : null,
             on: {
                click: (e: Event) => {
@@ -470,12 +496,37 @@ export default Vue.extend({
                   this.updateSelection(data);
                }
             }
-          }, cells);
+          }, cells)];
+
+         if(this.vExpanded[data[this.idField]]) {
+            const buildScoped = (scopeName: string) => {
+               const scope = this.$scopedSlots[scopeName];
+               if(!scope) {
+                  logError(`Unable to find scoped slot named '${this.detailsTemplate}' for details row.`);
+                  return null;
+               }
+               return scope({item: data});
+            };
+            const buildDetails = () => {
+               if(typeof this.detailsTemplate !== "string") {
+                  const detailsResult = this.detailsTemplate(data, h);
+                  return typeof detailsResult === "string"
+                     ? buildScoped(detailsResult)
+                     : detailsResult;
+               }
+               return buildScoped(this.detailsTemplate);
+            };
+            rows.push(h("tr", {
+               class: "dg-details-row"
+            }, [ h("td", { attrs: { colspan: cells.length } }, [buildDetails()]) ]));
+         }
+
+         return rows;
       };
 
       const cols = columns.map(i => h("col", { style: { width: i.definition.width ? i.definition.width : undefined } }));
       const thead = h("thead", {class: "dg-head"}, [h("tr", {}, headerCells)]);
-      const dataRows = this.vPageData.map(renderRow);
+      const dataRows = chain(this.vPageData).selectMany(renderRow).toList();
       const tbody = h("tbody", { class: "dg-body" }, dataRows);
       const dataTable = h("table", { class: "dg-table" }, [cols, thead, tbody]);
 

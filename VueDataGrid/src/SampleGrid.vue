@@ -2,7 +2,16 @@
    <div>
       <div id="sample">
          <!-- :filters="{filters: [{field: 'f2', value: 'b3'}, {field: 'f2', value: 'b4'}]}" -->
-         <data-grid id-field="f1" selection-mode="multi" :keep-selection="false" :page.sync="page" :source="data" :page-size="pageSize" :sorting="['f2', 'f3']" :sortable="canSort">
+         <data-grid 
+            id-field="f1" 
+            details-template="details-tpl"
+            selection-mode="none" 
+            :keep-selection="false" 
+            :page.sync="page" 
+            :source="data" 
+            :page-size="pageSize" 
+            :sorting="['f2', 'f3']" 
+            :sortable="canSort">
             <data-column field="f3" name="Mapped" :values="[{key: true, value: 't'}]" type="bool"></data-column>
             <data-column field="fDate" name="Date" type="dateTime" head-template="head-off" :filter="true"></data-column>
             <data-column width="20%" :field="column.field" :name.sync="column.name" v-for="column in columns" :key="column.id" template="field-tpl"></data-column>
@@ -15,6 +24,10 @@
             </div>
             <div slot="commands-tpl" slot-scope="{row}">
                <button v-on:click="itemAction(row)">show f3 value</button>
+            </div>
+            <div slot="details-tpl" slot-scope="{item}">
+               <div>F1: {{item.f1}}</div>
+               <div>F2: {{item.f2}}</div>
             </div>
             <!--<filter-group>
                <filter-field v-for="(item, index) in filters" :key="'k'+index" :field="item.field" :value="item.value"></filter-field>
@@ -38,7 +51,7 @@
 
 
 <script lang="ts">
-import Vue from 'vue'
+import Vue,{ CreateElement } from 'vue'
 import "./index";
 
 export default Vue.extend({
@@ -75,6 +88,9 @@ export default Vue.extend({
       };
    },
    methods: {
+      detailsFunc(item: any, h: CreateElement) {
+         return h("div", {}, JSON.stringify(item));
+      },
       append() {
          this.page++;
       },
