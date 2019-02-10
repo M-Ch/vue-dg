@@ -18,6 +18,7 @@
             :keep-selection="false" 
             :page.sync="page" 
             :source="data" 
+            :row-class="rowClass"
             :page-size="pageSize" 
             :sorting="['f2', 'f3']" 
             :sortable="canSort">
@@ -107,6 +108,9 @@ export default Vue.extend({
       };
    },
    methods: {
+      rowClass(item: any) {
+         return item.status === 1 ? "danger" : null;
+      },
       detailsFunc(item: any, h: CreateElement) {
          return h("div", {}, JSON.stringify(item));
       },

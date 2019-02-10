@@ -59,6 +59,7 @@ interface IThis extends Vue, IMethods, IData {
    columnFilters: ds.IColumnFilter[];
    filters: Array<ds.IFilterGroup | ds.IFilterValue> | ds.IFilterValue | ds.IFilterGroup;
    detailsTemplate: string | ((item: any, h: CreateElement) => string | VNode);
+   rowClass: (item: any) => string | string[];
    idField: string;
    selectedIds: any[];
    selected: any[];
@@ -162,6 +163,7 @@ export default Vue.extend({
      canReload: { type: Boolean, default: true },
      uri: { type: String, default: null },
      pageUri: { type: String, default: null },
+     rowClass: { type: Function },
      filters: {},
      detailsTemplate: { default: null },
      theme: { type: String, default: "dg-light" }
@@ -508,8 +510,17 @@ export default Vue.extend({
                })
             ]));
 
+         const classes = selected[data[this.idField]] ? ["dg-selected"] : [];
+         if(this.rowClass) {
+            const additional = this.rowClass(data);
+            if(Array.isArray(additional))
+               classes.push(...additional);
+            if(typeof additional === "string")
+               classes.push(additional);
+         }
+
          const rows = [h("tr", {
-            class: selected[data[this.idField]] ? "dg-selected" : null,
+            class: classes.length > 0 ? classes : undefined,
             on: {
                click: (e: Event) => {
                   if(this.selectionMode === SelectionMode.None)
