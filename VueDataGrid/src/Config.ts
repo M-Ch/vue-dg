@@ -2,7 +2,7 @@ import { formatDate } from "./DateFormat";
 
 interface ITypeConfig {
    name: string;
-   formatter?: (value: any) => string;
+   formatter?: (value: any, options: any) => string;
    filterComponent?: string;
 }
 
@@ -67,7 +67,7 @@ export function setLanguage(lang: ILang) {
 }
 
 export interface ITypeDefinition {
-   formatter?: (value: any) => string;
+   formatter?: (value: any, options: any) => string;
    filterComponent?: string;
 }
 
@@ -79,7 +79,7 @@ export function addType(name: string, definition: ITypeDefinition) {
    };
 }
 
-export function getFormatter(typeName: string | undefined | null): (value: any) => string {
+export function getFormatter(typeName: string | undefined | null): (value: any, options: any) => string {
    function defaultFormatter(value: any) {
       return value !== undefined || value !== null ? ""+value : "";
    }
@@ -101,6 +101,12 @@ export function localize(key: LangKey) {
    return i18n[key];
 }
 
+export function setFilterComponent(typeName: string, filterComponent: string) {
+   const entry = types[typeName];
+   if(entry)
+      entry.filterComponent = filterComponent;
+}
+
 addType("bool", {
    formatter: value => {
       if(value === undefined || value === null)
@@ -111,23 +117,23 @@ addType("bool", {
 });
 
 addType("date", {
-   formatter: value => {
+   formatter: (value, options) => {
       if(!value)
          return "";
       const date = value instanceof Date
          ? value
          : new Date(value);
-      return formatDate(date, i18n.dateFormat);
+      return formatDate(date, typeof options === "string" ? options : i18n.dateFormat);
    }
 });
 
 addType("dateTime", {
-   formatter: value => {
+   formatter: (value, options) => {
       if(!value)
          return "";
       const date = value instanceof Date
          ? value
          : new Date(value);
-      return formatDate(date, i18n.dateTimeFormat);
+      return formatDate(date, typeof options === "string" ? options : i18n.dateTimeFormat);
    }
 });

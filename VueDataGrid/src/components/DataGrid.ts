@@ -467,7 +467,7 @@ export default Vue.extend({
                   const match = binding.values[""+rawValue];
                   return match !== undefined ? match : ""+rawValue;
                }
-               return getFormatter(column.type)(rawValue);
+               return getFormatter(column.type)(rawValue, column.formatOptions !== undefined ? column.formatOptions : null);
             }
 
             const tpl = this.$scopedSlots[column.template];

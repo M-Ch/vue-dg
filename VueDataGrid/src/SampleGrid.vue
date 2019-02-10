@@ -23,7 +23,7 @@
             :sorting="['f2', 'f3']" 
             :sortable="canSort">
             <data-column field="status" name="Status" :values="statuses"></data-column>
-            <data-column field="fDate" name="Date" type="dateTime" head-template="head-off" :filter="true"></data-column>
+            <data-column field="fDate" name="Date" type="dateTime" head-template="head-off" :filter="true" format-options="YYYY-MM"></data-column>
             <data-column width="20%" :field="column.field" :name.sync="column.name" v-for="column in columns" :key="column.id" template="field-tpl"></data-column>
             <data-column name="Commands" template="commands-tpl" width="150px" icon="fa fa-address-book"></data-column>
             <div slot="head-off" slot-scope="column">

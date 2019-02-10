@@ -14,6 +14,7 @@ export interface IDataColumn {
    sortable?: boolean;
    width?: string;
    type?: string;
+   formatOptions?: any;
    values?: IKeyValuePair[];
    icon?: string;
    filter?: string | boolean;
@@ -31,7 +32,8 @@ export default Vue.extend({
       width: { type: String },
       type: { type: String },
       values: { type: Array },
-      icon: { type: String }
+      icon: { type: String },
+      formatOptions: { },
    },
    render(this: Vue, h) {
       return h("div");
