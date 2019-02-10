@@ -470,13 +470,22 @@ export default Vue.extend({
                return getFormatter(column.type)(rawValue, column.formatOptions !== undefined ? column.formatOptions : null);
             }
 
-            const tpl = this.$scopedSlots[column.template];
-            if(!tpl) {
-               logError(`Unable to find scoped slot named '${column.template}' defined as template for grid data column.`);
-               return "";
-            }
+            const buildFromScope = (scopeName: string) => {
+               const tpl = this.$scopedSlots[scopeName];
+               if(!tpl) {
+                  logError(`Unable to find scoped slot named '${scopeName}' defined as template for grid data column.`);
+                  return "";
+               }
+               return tpl({row: data, value: column.field ? data[column.field] : null});
+            };
 
-            return tpl({row: data, value: column.field ? data[column.field] : null});
+            if(typeof column.template === "string")
+               return buildFromScope(column.template);
+
+            const result = column.template(column.field ? data[column.field] : null, data, h);
+            if(typeof result === "string")
+               return buildFromScope(result);
+            return result;
          };
          return h("td", [buildContent()]);
       };

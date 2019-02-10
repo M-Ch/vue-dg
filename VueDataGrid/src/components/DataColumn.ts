@@ -1,4 +1,4 @@
-import Vue from "vue";
+import Vue, { VNode, CreateElement } from "vue";
 export const DataColumn = "DataColumn";
 
 export interface IKeyValuePair {
@@ -9,7 +9,7 @@ export interface IKeyValuePair {
 export interface IDataColumn {
    name?: string;
    field?: string;
-   template?: string;
+   template?: string | ((value: any, item: any, h: CreateElement) => string | VNode);
    headTemplate?: string;
    sortable?: boolean;
    width?: string;
@@ -24,7 +24,7 @@ export default Vue.extend({
    name: DataColumn,
    props: {
       name: { type: String },
-      template: { type: String },
+      template: { },
       headTemplate: { type: String },
       field: { type: String },
       sortable: { type: Boolean, default: true },
