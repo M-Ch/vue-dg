@@ -1,8 +1,9 @@
 import { formatDate } from "./DateFormat";
+import { VNode, CreateElement } from 'vue';
 
 interface ITypeConfig {
    name: string;
-   formatter?: (value: any, options: any) => string;
+   formatter?: (value: any, options: any, h: CreateElement) => string | VNode;
    filterComponent?: string;
 }
 
@@ -67,7 +68,7 @@ export function setLanguage(lang: ILang) {
 }
 
 export interface ITypeDefinition {
-   formatter?: (value: any, options: any) => string;
+   formatter?: (value: any, options: any, h: CreateElement) => string | VNode;
    filterComponent?: string;
 }
 
@@ -79,7 +80,7 @@ export function addType(name: string, definition: ITypeDefinition) {
    };
 }
 
-export function getFormatter(typeName: string | undefined | null): (value: any, options: any) => string {
+export function getFormatter(typeName: string | undefined | null): (value: any, options: any, h: CreateElement) => string | VNode {
    function defaultFormatter(value: any) {
       return value !== undefined || value !== null ? ""+value : "";
    }
