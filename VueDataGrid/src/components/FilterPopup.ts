@@ -1,12 +1,14 @@
 import Vue from "vue";
 import { IFilterGroup, IFilterValue, FilterOperator } from "../DataSource";
 import BoolFilter from "./BoolFilter";
+import ValueListFilter from "./ValueListFilter";
 import { localize } from '@/Config';
 
 interface IThis extends Vue {
    value: IFilterGroup[];
    opened: boolean;
    filterComponent: string;
+   filterOptions: any;
    fieldName: string;
    workingValue: IFilterGroup[];
    clickListener: () => void;
@@ -17,7 +19,8 @@ export default Vue.extend({
    props: {
       value: { type: Array, default: () => [] },
       fieldName: { type: String },
-      filterComponent: { type: String }
+      filterComponent: { type: String },
+      filterOptions: { }
    },
    mounted(this: IThis) {
       this.clickListener = () => {
@@ -62,6 +65,7 @@ export default Vue.extend({
                h(this.filterComponent, {
                   props: {
                      value: this.workingValue,
+                     options: this.filterOptions,
                      fieldName: this.fieldName
                   },
                   on: {
@@ -95,6 +99,7 @@ export default Vue.extend({
       ]);
    },
    components: {
-      BoolFilter
+      BoolFilter,
+      ValueListFilter
    },
 });

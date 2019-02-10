@@ -20,6 +20,7 @@ export interface ILang {
    pageListItemTitle: string;
    filterAccept: string;
    filterReset: string;
+   dropdownLabel: string;
 }
 
 const types: {[key: string]: ITypeConfig } = {};
@@ -36,7 +37,8 @@ let i18n: ILang = {
    lastPage: "Last page",
    pageListItemTitle: "Page %page%",
    filterAccept: "Accept",
-   filterReset: "Reset"
+   filterReset: "Reset",
+   dropdownLabel: "Select...",
 };
 
 export interface ISettings {

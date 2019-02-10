@@ -2,7 +2,7 @@
    <div>
       <div id="sample">
          <!-- :filters="{filters: [{field: 'f2', value: 'b3'}, {field: 'f2', value: 'b4'}]}" -->
-         <data-grid 
+         <!--<data-grid 
             id-field="Id" 
             source="http://localhost/VueDataGrid.Sample/odata/sampleSet" source-options="odata"
             :uri.sync="dataUri"
@@ -10,7 +10,7 @@
             <data-column field="Name"></data-column>
             <data-column field="Price"></data-column>
             <filter-field field="Name" value="a" operator="substr"></filter-field>
-         </data-grid>
+         </data-grid>-->
          <data-grid 
             id-field="f1" 
             details-template="details-tpl"
@@ -21,7 +21,7 @@
             :page-size="pageSize" 
             :sorting="['f2', 'f3']" 
             :sortable="canSort">
-            <data-column field="f3" name="Mapped" :values="[{key: true, value: 't'}]" type="bool"></data-column>
+            <data-column field="status" name="Status" :values="statuses"></data-column>
             <data-column field="fDate" name="Date" type="dateTime" head-template="head-off" :filter="true"></data-column>
             <data-column width="20%" :field="column.field" :name.sync="column.name" v-for="column in columns" :key="column.id" template="field-tpl"></data-column>
             <data-column name="Commands" template="commands-tpl" width="150px" icon="fa fa-address-book"></data-column>
@@ -85,18 +85,24 @@ export default Vue.extend({
             { name: "a", id: 1, field: "f2" },
             { name: "b", id: 2, field: "f2" }
          ],
+         statuses: [
+            {key: 1, value: "Pending" },
+            {key: 2, value: "Processing" },
+            {key: 3, value: "Completed" },
+            {key: 4, value: "Error" },
+         ],
          data: [
-            {fDate: new Date(), f1: "a1", f2: "b1", f3: true },
-            {fDate: new Date(), f1: "a2", f2: "b2", f3: false },
-            {fDate: new Date(), f1: "a3", f2: "b3", f3: true },
-            {fDate: new Date(), f1: "a4", f2: "b4", f3: true },
-            {fDate: new Date(), f1: "a5", f2: "b5", f3: false },
-            {fDate: new Date(), f1: "a6", f2: "b6", f3: false },
-            {fDate: new Date(), f1: "a7", f2: "b7", f3: true },
-            {fDate: new Date(), f1: "a8", f2: "b8", f3: true },
-            {fDate: new Date(), f1: "a9", f2: "b9", f3: true },
-            {fDate: new Date(), f1: "a10", f2: "b10", f3: true },
-            {fDate: new Date(), f1: "a11", f2: "b11", f3: true },
+            {status: 1, fDate: new Date(), f1: "a1", f2: "b1", f3: true },
+            {status: 2, fDate: new Date(), f1: "a2", f2: "b2", f3: false },
+            {status: 4, fDate: new Date(), f1: "a3", f2: "b3", f3: true },
+            {status: 2, fDate: new Date(), f1: "a4", f2: "b4", f3: true },
+            {status: 3, fDate: new Date(), f1: "a5", f2: "b5", f3: false },
+            {status: 3, fDate: new Date(), f1: "a6", f2: "b6", f3: false },
+            {status: 4, fDate: new Date(), f1: "a7", f2: "b7", f3: true },
+            {status: 3, fDate: new Date(), f1: "a8", f2: "b8", f3: true },
+            {status: 2, fDate: new Date(), f1: "a9", f2: "b9", f3: true },
+            {status: 2, fDate: new Date(), f1: "a10", f2: "b10", f3: true },
+            {status: 1, fDate: new Date(), f1: "a11", f2: "b11", f3: true },
          ]
       };
    },

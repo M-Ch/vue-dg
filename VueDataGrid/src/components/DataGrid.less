@@ -63,10 +63,46 @@
       position: relative;
 
       .dg-filter-popup {
+         cursor: auto;
          [data-component='BoolFilter'] {
             label {
                display: block;
                line-height: 1.8em;
+            }
+         }
+
+         [data-component='ValueListFilter'] {
+            .dg-value-list { 
+               min-width: 150px 
+            };
+
+            .dg-select-placeholder {
+               font-style: italic;
+            }
+
+            ul {
+               margin: 0;
+               padding: 0;
+               margin-bottom: 10px;
+            }
+            li {
+               list-style: none;
+               margin-bottom: 5px;
+               a {
+                  float: right;
+                  text-decoration: none;
+                  font-size: 1.1em;
+                  margin-right: 2px;
+               }
+            }
+
+            select {
+               width: 100%;
+               display: block;
+               font-style: italic;
+               option {
+                  font-style: normal;
+               }
             }
          }
       }
@@ -171,6 +207,12 @@
          left: 0;
          background: white;
          box-shadow: 0px 0px 5px 0px rgba(0,0,0,0.62);
+
+         [data-component='ValueListFilter'] {
+            .dg-value-list { 
+               padding: @padding;
+            };
+         }
       }
 
       .dg-popup-actions {
@@ -193,6 +235,7 @@
 
       .dg-popup-actions {
          border-top: 1px solid @borderColor;
+         display: block;
          padding: @padding;
          padding-bottom: 0;
 
