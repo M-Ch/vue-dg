@@ -1,6 +1,7 @@
 import Vue from "vue";
 import { IFilterGroup, IFilterValue, FilterOperator } from "../DataSource";
 import BoolFilter from "./BoolFilter";
+import DateFilter from "./DateFilter";
 import ValueListFilter from "./ValueListFilter";
 import { localize } from '@/Config';
 
@@ -100,6 +101,7 @@ export default Vue.extend({
    },
    components: {
       BoolFilter,
+      DateFilter,
       ValueListFilter
    },
 });

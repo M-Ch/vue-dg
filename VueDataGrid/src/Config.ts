@@ -167,7 +167,8 @@ addType("date", {
          ? value
          : new Date(value);
       return formatDate(date, typeof options === "string" ? options : calendarSettings.dateFormat);
-   }
+   },
+   filterComponent: "DateFilter"
 });
 
 addType("dateTime", {
