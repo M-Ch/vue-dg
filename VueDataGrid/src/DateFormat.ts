@@ -103,6 +103,67 @@ export function isMatching(input: string, position: number, format: string) {
    return false;
 }
 
+export function nearestInputIndex(position: number,format: string) {
+   let start = 0;
+   for(const part of tokenize(format)) {
+      const value = part.type === TokenType.Const
+         ? part.value
+         : part.part.token;
+      if(part.type === TokenType.Const || position >= start + value.length) {
+         start += value.length;
+         continue;
+      }
+      return Math.max(start, position);
+   }
+   return format.length;
+}
+
+export function nextBounadry(position: number, format: string) {
+   let start = 0;
+   if(position >= format.length-1)
+      return format.length;
+   for(const part of tokenize(format)) {
+      if(part.type === TokenType.Const) {
+         start += part.value.length;
+         continue;
+      }
+      const length = part.part.token.length;
+      if(position >= start+length) {
+         start += length;
+         continue;
+      }
+      if(position < start)
+         return start;
+      return start+length;
+   }
+   return format.length-1;
+}
+
+export function previousBoundary(position: number, format: string) {
+   let end = format.length-1;
+   const tokens = tokenize(format);
+   for(let a=tokens.length-1;a>=0;a--) {
+      const part = tokens[a];
+      if(part.type === TokenType.Const) {
+         end -= part.value.length;
+         continue;
+      }
+
+      const length = part.part.token.length;
+      if(position <= end-length+1) {
+         end -= length;
+         continue;
+      }
+
+      if(position > end+1)
+         return end+1;
+
+      return end-length+1;
+   }
+
+   return 0;
+}
+
 export function tryParse(value: string, format: string): Date | null {
    if(!value)
       return null;
@@ -123,6 +184,7 @@ export function tryParse(value: string, format: string): Date | null {
       const tokenValue = value.substr(0, datePart.token.length);
       if(!/^\d+$/gm.test(tokenValue))
          return null;
+      value = value.substr(datePart.token.length);
       datePart.setter(result, parseInt(tokenValue, 10));
    }
 

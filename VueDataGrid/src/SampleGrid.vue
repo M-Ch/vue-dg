@@ -11,6 +11,7 @@
             <data-column field="Price"></data-column>
             <filter-field field="Name" value="a" operator="substr"></filter-field>
          </data-grid>-->
+         <date-picker format="YYYY-MM-DD" placeholder="yyyy-mm-dd" v-model="sampleDate"></date-picker>
          <data-grid 
             id-field="f1" 
             details-template="details-tpl"
@@ -64,7 +65,8 @@
 
 
 <script lang="ts">
-import Vue,{ CreateElement } from 'vue'
+import Vue,{ CreateElement } from 'vue';
+import DatePicker from './components/DatePicker'
 import "./index";
 
 export default Vue.extend({
@@ -72,6 +74,7 @@ export default Vue.extend({
    data() {
       return {
          test: "aaaaa",
+         sampleDate: new Date(),
          dataUri: null,
          dataPage: null,
          canSort: true,
@@ -107,6 +110,9 @@ export default Vue.extend({
             {status: 1, fDate: new Date(), f1: "a11", f2: "b11", f3: true },
          ]
       };
+   },
+   components: {
+      DatePicker
    },
    methods: {
       rowClass(item: any) {
