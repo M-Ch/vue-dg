@@ -3,7 +3,7 @@ import DataGrid from "./components/DataGrid";
 import DataColumn from "./components/DataColumn";
 import FilterGroup from "./components/FilterGroup";
 import FilterField from "./components/FilterField";
-import { addType, setLanguage, setFilterComponent } from "./Config";
+import { addType, setLanguage, setFilterComponent, setCalendar } from "./Config";
 import { addSource, addRemoteSource, addXhrHook } from "./DataSource";
 import { mapData, buildUrl } from "./OData";
 
@@ -22,6 +22,7 @@ const plugin = {
    addSource,
    addRemoteSource,
    addXhrHook,
+   setCalendar,
    setFilterComponent,
    setLanguage
 };

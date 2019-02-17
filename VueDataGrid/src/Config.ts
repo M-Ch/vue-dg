@@ -10,8 +10,6 @@ interface ITypeConfig {
 export interface ILang {
    yes: string;
    no: string;
-   dateFormat: string;
-   dateTimeFormat: string;
    pagerPage: string;
    pagerOfPages: string;
    firstPage: string;
@@ -28,8 +26,6 @@ const types: {[key: string]: ITypeConfig } = {};
 let i18n: ILang = {
    yes: "Yes",
    no: "No",
-   dateFormat: "YYYY-MM-DD",
-   dateTimeFormat: "YYYY-MM-DD HH:mm",
    pagerPage: "Page",
    pagerOfPages: "of",
    firstPage: "First page",
@@ -41,6 +37,52 @@ let i18n: ILang = {
    filterReset: "Reset",
    dropdownLabel: "Select...",
 };
+
+export interface ICalendar {
+   dateFormat: string;
+   dateTimeFormat: string;
+   weekStart: number;
+   dayNames: string[];
+   monthNamesFull: string[];
+   monthNamesShort: string[];
+   yearFormat: string;
+   yearRangeFormat: string;
+   monthFormat: string;
+   monthFirst: boolean;
+}
+
+const calendarSettings: ICalendar = {
+   dateFormat: "YYYY-MM-DD",
+   dateTimeFormat: "YYYY-MM-DD HH:mm",
+   dayNames: [
+      "Sun",
+      "Mon",
+      "Tue",
+      "Wed",
+      "Thu",
+      "Fri",
+      "Sat",
+   ],
+   monthNamesFull: ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"],
+   monthNamesShort: ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"],
+   weekStart: 1,
+   yearFormat: "{year}",
+   yearRangeFormat: "{from} - {to}",
+   monthFormat: "{month}",
+   monthFirst: true
+};
+
+export function getCalendar() {
+   return calendarSettings;
+}
+
+export function setCalendar(calendar: any | ICalendar) {
+   const target = calendarSettings as any;
+   for(const prop in Object.getOwnPropertyNames(calendar)) {
+      if(target[prop] !== undefined)
+         target[prop] = calendar[prop];
+   }
+}
 
 export interface ISettings {
    idField: string;
@@ -124,7 +166,7 @@ addType("date", {
       const date = value instanceof Date
          ? value
          : new Date(value);
-      return formatDate(date, typeof options === "string" ? options : i18n.dateFormat);
+      return formatDate(date, typeof options === "string" ? options : calendarSettings.dateFormat);
    }
 });
 
@@ -135,6 +177,6 @@ addType("dateTime", {
       const date = value instanceof Date
          ? value
          : new Date(value);
-      return formatDate(date, typeof options === "string" ? options : i18n.dateTimeFormat);
+      return formatDate(date, typeof options === "string" ? options : calendarSettings.dateTimeFormat);
    }
 });
