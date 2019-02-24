@@ -20,6 +20,8 @@ export interface ILang {
    filterAccept: string;
    filterReset: string;
    dropdownLabel: string;
+   rangeFrom: string;
+   rangeTo: string;
 }
 
 const types: {[key: string]: ITypeConfig } = {};
@@ -36,11 +38,15 @@ let i18n: ILang = {
    filterAccept: "Accept",
    filterReset: "Reset",
    dropdownLabel: "Select...",
+   rangeFrom: "From:",
+   rangeTo: "To:",
 };
 
 export interface ICalendar {
    dateFormat: string;
+   datePlaceholder: string;
    dateTimeFormat: string;
+   dateTimePlaceholder: string;
    weekStart: number;
    dayNames: string[];
    monthNamesFull: string[];
@@ -53,7 +59,9 @@ export interface ICalendar {
 
 const calendarSettings: ICalendar = {
    dateFormat: "YYYY-MM-DD",
+   datePlaceholder: "yyyy-mm-dd",
    dateTimeFormat: "YYYY-MM-DD HH:mm",
+   dateTimePlaceholder: "yyyy-mm-dd hh:mm",
    dayNames: [
       "Sun",
       "Mon",

@@ -4,7 +4,7 @@ import { chain } from "./linq";
 interface IDatePart {
    token: string;
    formatter: (date: Date) => string;
-   setter: (target: Date, value: number) => void;
+   setter: (target: IDate, value: number) => void;
 }
 
 function leftPad(text: string, length: number, placeholder: string) { //no we are not using library for this...
@@ -15,18 +15,18 @@ function leftPad(text: string, length: number, placeholder: string) { //no we ar
 }
 
 const dateParts: IDatePart[] = [
-   {token: "YYYY", formatter: d => ""+d.getFullYear(), setter: (t,v) => t.setFullYear(v) },
-   {token: "YY", formatter: d => (""+d.getFullYear()).substr(2), setter: (t,v) => t.setFullYear(v) }, //fix this after 9999 year ;)
-   {token: "M", formatter: d => ""+(d.getMonth()+1), setter: (t,v) => t.setMonth(v-1) },
-   {token: "MM", formatter: d => leftPad(""+(d.getMonth()+1), 2, "0"), setter: (t,v) => t.setMonth(v-1) },
-   {token: "D", formatter: d => ""+d.getDate(), setter: (t,v) => t.setDate(v) },
-   {token: "DD", formatter: d => leftPad(""+d.getDate(), 2, "0"), setter: (t,v) => t.setDate(v) },
-   {token: "H", formatter: d => ""+d.getHours(), setter: (t,v) => t.setHours(v) },
-   {token: "HH", formatter: d => leftPad(""+d.getHours(), 2, "0"), setter: (t,v) => t.setHours(v) },
-   {token: "m", formatter: d => ""+d.getMinutes(), setter: (t,v) => t.setMinutes(v) },
-   {token: "mm", formatter: d => leftPad(""+d.getMinutes(), 2, "0"), setter: (t,v) => t.setMinutes(v) },
-   {token: "s", formatter: d => ""+d.getSeconds(), setter: (t,v) => t.setSeconds(v) },
-   {token: "ss", formatter: d => leftPad(""+d.getSeconds(), 2, "0"), setter: (t,v) => t.setSeconds(v) },
+   {token: "YYYY", formatter: d => ""+d.getFullYear(), setter: (t,v) => t.year = v },
+   {token: "YY", formatter: d => (""+d.getFullYear()).substr(2), setter: (t,v) => t.year = v }, //fix this after 9999 year ;)
+   {token: "M", formatter: d => ""+(d.getMonth()+1), setter: (t,v) => t.month = v-1 },
+   {token: "MM", formatter: d => leftPad(""+(d.getMonth()+1), 2, "0"), setter: (t,v) => t.month = v-1 },
+   {token: "D", formatter: d => ""+d.getDate(), setter: (t,v) => t.day = v },
+   {token: "DD", formatter: d => leftPad(""+d.getDate(), 2, "0"), setter: (t,v) => t.day = v },
+   {token: "H", formatter: d => ""+d.getHours(), setter: (t,v) => t.hour = v },
+   {token: "HH", formatter: d => leftPad(""+d.getHours(), 2, "0"), setter: (t,v) => t.hour = v },
+   {token: "m", formatter: d => ""+d.getMinutes(), setter: (t,v) => t.minute = v },
+   {token: "mm", formatter: d => leftPad(""+d.getMinutes(), 2, "0"), setter: (t,v) => t.minute = v },
+   {token: "s", formatter: d => ""+d.getSeconds(), setter: (t,v) => t.second = v },
+   {token: "ss", formatter: d => leftPad(""+d.getSeconds(), 2, "0"), setter: (t,v) => t.second = v },
 ];
 
 enum TokenType {
@@ -164,11 +164,27 @@ export function previousBoundary(position: number, format: string) {
    return 0;
 }
 
+interface IDate {
+   year: number;
+   month: number;
+   day: number;
+   hour: number;
+   minute: number;
+   second: number;
+}
+
 export function tryParse(value: string, format: string): Date | null {
    if(!value)
       return null;
 
-   const result = new Date(0,0,0);
+   const result: IDate = {
+      day: 0,
+      hour: 0,
+      minute: 0,
+      month: 0,
+      second: 0,
+      year: 0
+   };
    const parts = tokenize(format);
    for(const part of parts) {
       if(!value)
@@ -188,5 +204,7 @@ export function tryParse(value: string, format: string): Date | null {
       datePart.setter(result, parseInt(tokenValue, 10));
    }
 
-   return value.length === 0 ? result : null;
+   return value.length === 0
+      ? new Date(result.year, result.month, result.day, result.hour, result.minute, result.second, 0) 
+      : null;
 }

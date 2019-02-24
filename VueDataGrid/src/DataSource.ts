@@ -26,6 +26,7 @@ export interface IFilterValue {
 
 export interface IFilterGroup {
    filters: IFilterValue[];
+   tag?: string;
 }
 
 export enum SortDirection {

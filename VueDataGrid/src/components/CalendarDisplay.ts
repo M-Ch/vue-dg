@@ -59,7 +59,15 @@ export default Vue.extend({
                   return "dg-prev";
                return i >= dayCount ? "dg-next" : null;
             })();
-            return h("li", { class: cssClass }, ""+current.getDate());
+            return h("li", {
+               class: cssClass,
+               on: {
+                  click: (e: Event) => {
+                     e.stopPropagation();
+                     this.$emit("input", current);
+                  }
+               }
+            }, ""+current.getDate());
          });
 
          return h("ul", { class: ["dg-days"] }, cells.toList());
@@ -170,7 +178,12 @@ export default Vue.extend({
       modes[Mode.Month] = { body: renderMonths, header: monthsHeader, subHeader: () => null };
       modes[Mode.Year] = { body: renderYears, header: yearsHeader, subHeader: () => null };
 
-      return h("div", { class: ["dg-calendar", `dg-type-${this.mode}`] }, [
+      return h("div", {
+         class: ["dg-calendar", `dg-type-${this.mode}`],
+         on: {
+            click: (e: Event) => e.stopPropagation()
+         }
+      }, [
          modes[this.mode].header(),
          modes[this.mode].subHeader(),
          h("div", { class: ["dg-calendar-display"] }, [

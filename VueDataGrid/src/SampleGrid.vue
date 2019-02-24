@@ -9,9 +9,9 @@
             :page-uri.sync="dataPage">
             <data-column field="Name"></data-column>
             <data-column field="Price"></data-column>
+            <data-column field="Release" :filter="true" type="date"></data-column>
             <filter-field field="Name" value="a" operator="substr"></filter-field>
          </data-grid>-->
-         <date-picker format="YYYY-MM-DD" placeholder="yyyy-mm-dd" v-model="sampleDate"></date-picker>
          <data-grid 
             id-field="f1" 
             details-template="details-tpl"
@@ -25,7 +25,8 @@
             :sortable="canSort">
             <data-column field="status" name="Status" :values="statuses"></data-column>
             <data-column field="status" :template="renderStatus"></data-column>
-            <data-column field="fDate" name="Date" type="date" head-template="head-off" :filter="true" format-options="YYYY-MM"></data-column>
+            <data-column field="fDate" name="Date" type="date" head-template="head-off" :filter="true" format-options="YYYY-MM-DD!"></data-column>
+            <data-column field="f3" name="bool" type="bool" :filter="true"></data-column>
             <data-column width="20%" :field="column.field" :name.sync="column.name" v-for="column in columns" :key="column.id" template="field-tpl"></data-column>
             <data-column name="Commands" template="commands-tpl" width="150px" icon="fa fa-address-book"></data-column>
             <div slot="head-off" slot-scope="column">

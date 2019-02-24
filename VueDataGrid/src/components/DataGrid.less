@@ -64,10 +64,22 @@
 
       .dg-filter-popup {
          cursor: auto;
+         z-index: 1000;
+         
          [data-component='BoolFilter'] {
             label {
                display: block;
                line-height: 1.8em;
+            }
+         }
+
+         [data-component='DateFilter'] {
+            .dg-date-filter > div {
+               margin-top: 5px; 
+               display: block;
+            }
+            & + .dg-popup-actions {
+               margin-top: 5px;
             }
          }
 
@@ -129,10 +141,21 @@
          position: relative;
       }
 
+      .dg-date-input {
+         margin-top: 2px;
+      }
+
       th {
          &.can-sort {
             cursor: pointer;
             user-select: none;
+         }
+      }
+
+      input { 
+         &[type="text"] {
+            padding: 2px 4px;
+            border-radius: 2px;
          }
       }
    }
@@ -174,67 +197,81 @@
       animation-direction: alternate;
       animation-timing-function: ease-in-out;
    }
+}
 
+.dg-date-input {
+   position: relative;
    .dg-calendar {
-      a {
-         text-decoration: none;
+      position: absolute;
+      left: 0;
+      top: 20px;
+      z-index: 1000;
+   }
+}
+
+.dg-calendar {
+   a {
+      text-decoration: none;
+   }
+
+   @outerPadding: 5px;
+   @itemPadding: 10px;
+   user-select: none;
+   border: 1px solid black;
+   background: white;
+   padding: @outerPadding;
+
+   .dg-calendar-head {
+      display: flex;
+      width: 100%;
+      padding: 10px;
+      box-sizing: border-box;
+   }
+
+   .dg-title {
+      flex-grow: 1;
+      text-align: center;
+
+      a + a {
+         margin-left: 5px;
       }
+   }
 
-      @itemPadding: 10px;
-      user-select: none;
+   .dg-links a {
+      font-size: 0.95em;
+   }
 
-      .dg-calendar-head {
-         display: flex;
-         width: 100%;
-         padding: 10px;
-         box-sizing: border-box;
+   &.dg-type-day {
+      @itemSize: 15px;
+      width: 7*(@itemPadding*2+@itemSize)+2*@outerPadding;
+      li {
+         width: @itemSize;
+         height: @itemSize;
       }
+   }
 
-      .dg-title {
-         flex-grow: 1;
-         text-align: center;
-
-         a + a {
-            margin-left: 5px;
-         }
-      }
-
-      .dg-links a {
-         font-size: 0.95em;
-      }
-
-      &.dg-type-day {
-         @itemSize: 15px;
-         width: 7*(@itemPadding*2+@itemSize);
-         li {
-            width: @itemSize;
-            height: @itemSize;
-         }
-      }
-
-      &.dg-type-month, &.dg-type-year {
-         @itemSize: 40px;
-         width: 4*(@itemPadding*2+@itemSize);
-
-         li {
-            width: @itemSize;
-            height: @itemSize;
-         }
-      }
-
-      ul {
-         list-style: none;
-         margin: 0;
-         padding: 0;
-      }
+   &.dg-type-month, &.dg-type-year {
+      @itemSize: 40px;
+      width: 4*(@itemPadding*2+@itemSize)+2*@outerPadding;
 
       li {
-         display: inline-block;
-         text-align: center;
-         box-sizing: content-box;
-         padding: @itemPadding;
-         cursor: pointer;
+         width: @itemSize;
+         height: @itemSize;
       }
+   }
+
+   ul {
+      list-style: none;
+      margin: 0;
+      padding: 0;
+   }
+
+   li {
+      display: inline-block;
+      text-align: center;
+      box-sizing: content-box;
+      padding: @itemPadding;
+      cursor: pointer;
    }
 }
 
@@ -261,6 +298,9 @@
    }
    
    .dg-calendar {
+      border: 1px solid @borderColor;
+      box-shadow: 0px 0px 5px 0px rgba(0,0,0,0.22);
+
       ul.dg-sub-header {
          li {
             font-size: 0.8em;
@@ -352,8 +392,14 @@
          padding: @padding;
          .row-border();
 
-         div {
+         > div {
             display: inline-block;
+         }
+      }
+
+      input {
+         &[type="text"] {
+            border: 1px solid @headerText;
          }
       }
    }

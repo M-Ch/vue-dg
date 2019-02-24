@@ -60,7 +60,12 @@ export default Vue.extend({
          }, "▼"),
          this.opened ? h("div", {
             class: "dg-filter-popup",
-            on: { click: (e: Event) => e.stopPropagation() }
+            on: {
+               click: (e: Event) => {
+                  e.stopPropagation();
+                  document.dispatchEvent(new Event("dg-date-picker-close"));
+               }
+            }
          }, [
             h("div", {attrs: { "data-component": this.filterComponent } }, [
                h(this.filterComponent, {

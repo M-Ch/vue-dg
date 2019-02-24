@@ -1,5 +1,6 @@
 import Vue from "vue";
 import * as dt from "../DateFormat";
+import CalendarDisplay from "./CalendarDisplay";
 
 interface IThis extends Vue {
    value: Date;
@@ -7,6 +8,9 @@ interface IThis extends Vue {
    format: string;
    placeholder: string;
    editIndex: number;
+   popupValue: Date;
+   clickListener: (e: Event) => void;
+   popupVisible: boolean;
 }
 
 function replacePart(text: string, index: number, value: string) {
@@ -30,11 +34,39 @@ export default Vue.extend({
    data(this: IThis) {
       return {
          editValue: "",
-         editIndex: null
+         editIndex: null,
+         popupValue: new Date(),
+         clickListener: null,
+         popupVisible: false,
       };
    },
+   mounted(this: IThis) {
+      this.editValue = this.value ? dt.formatDate(this.value, this.format) : "";
+      this.clickListener = (e: Event) => {
+         if(e instanceof CustomEvent && e.detail && e.detail.sender === this)
+            return;
+         this.popupVisible = false;
+         e.stopPropagation();
+      };
+   },
+   components: {
+      CalendarDisplay
+   },
+   watch: {
+      popupVisible(this: IThis) {
+         if(this.popupVisible) {
+            const ev = new CustomEvent("dg-date-picker-close", { detail: { sender: this } });
+            document.dispatchEvent(ev);
+            document.addEventListener("click", this.clickListener);
+            document.addEventListener("dg-date-picker-close", this.clickListener);
+         } else {
+            document.removeEventListener("click", this.clickListener);
+            document.removeEventListener("dg-date-picker-close", this.clickListener);
+         }
+      }
+   },
    render(this: IThis, h) {
-      return h("input", {
+      const textInput = h("input", {
          attrs: {
             type: "text",
             placeholder: this.placeholder
@@ -48,12 +80,14 @@ export default Vue.extend({
             keydown: (e: KeyboardEvent) => {
                if(e.key === "Tab")
                   return true;
-               if(e.key === "Escape")
-                  return true;
                if(e.key === "c" && e.ctrlKey)
                   return true;
                if(e.key === "a" && e.ctrlKey)
                   return true;
+               if(e.key === "Enter" || e.key === "Escape") {
+                  this.popupVisible = false;
+                  return;
+               }
                if(/^F\d+$/gm.test(e.key))
                   return true;
 
@@ -132,6 +166,9 @@ export default Vue.extend({
                      return;
                   this.editValue = replacePart(target, newIndex, e.key);
                   this.editIndex = nextIndex;
+                  const candidate = dt.tryParse(this.editValue, this.format);
+                  if(candidate)
+                     this.popupValue = candidate;
                })();
 
                e.stopPropagation();
@@ -141,10 +178,13 @@ export default Vue.extend({
             focus: (e: Event) => {
                const input = e.target as HTMLInputElement;
                this.$nextTick(() => this.editIndex = input.selectionStart ? input.selectionStart : 0);
+               this.popupVisible = true;
             },
             click: (e: Event) => {
                const input = e.target as HTMLInputElement;
                this.$nextTick(() => this.editIndex = input.selectionStart ? input.selectionStart : 0);
+               this.popupVisible = true;
+               e.stopPropagation();
             },
             blur: (e: Event) => {
                const result = dt.tryParse(this.editValue, this.format);
@@ -153,5 +193,23 @@ export default Vue.extend({
             }
          }
       });
+      return h("div", { class: "dg-date-input" }, [
+         textInput,
+         this.popupVisible
+            ? h("CalendarDisplay", {
+               props: {
+                  value: this.popupValue
+               },
+               on: {
+                  input: (value: Date) => {
+                     this.popupValue = value;
+                     this.$emit("input", this.popupValue);
+                     this.editValue = dt.formatDate(this.popupValue, this.format);
+                     this.popupVisible = false;
+                  }
+               }
+            })
+            : null
+      ]);
    }
 });
