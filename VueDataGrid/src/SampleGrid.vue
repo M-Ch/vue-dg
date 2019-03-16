@@ -4,7 +4,7 @@
          <!-- <time-display v-model="sampleDate" format="HH.mm.ss">
          </time-display> -->
          <div class="dg-time-display">
-            <scroll-panel>
+            <scroll-panel :value="50">
                <div>
                   <div v-for="(item, index) in data" :key="index">
                      {{item.f1}}
