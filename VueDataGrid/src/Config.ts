@@ -47,6 +47,8 @@ export interface ICalendar {
    datePlaceholder: string;
    dateTimeFormat: string;
    dateTimePlaceholder: string;
+   timeFormat: string;
+   timePlaceholder: string;
    weekStart: number;
    dayNames: string[];
    monthNamesFull: string[];
@@ -60,6 +62,8 @@ export interface ICalendar {
 const calendarSettings: ICalendar = {
    dateFormat: "YYYY-MM-DD",
    datePlaceholder: "yyyy-mm-dd",
+   timeFormat: "HH:mm",
+   timePlaceholder: "hh:mm",
    dateTimeFormat: "YYYY-MM-DD HH:mm",
    dateTimePlaceholder: "yyyy-mm-dd hh:mm",
    dayNames: [

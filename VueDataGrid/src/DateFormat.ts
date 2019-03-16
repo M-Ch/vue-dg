@@ -1,32 +1,31 @@
 import { chain } from "./linq";
+import { leftPad } from "@/StringFormat";
 //basic date time formatting
 
 interface IDatePart {
    token: string;
    formatter: (date: Date) => string;
    setter: (target: IDate, value: number) => void;
+   kind: TokenKind;
 }
 
-function leftPad(text: string, length: number, placeholder: string) { //no we are not using library for this...
-   let result = text ? text : "";
-   while(result.length < length)
-      result = placeholder+result;
-   return result.length > length ? result.substr(0, length) : result;
+export enum TokenKind {
+   Year,
+   Month,
+   Day,
+   Hour,
+   Minute,
+   Second
 }
 
 const dateParts: IDatePart[] = [
-   {token: "YYYY", formatter: d => ""+d.getFullYear(), setter: (t,v) => t.year = v },
-   {token: "YY", formatter: d => (""+d.getFullYear()).substr(2), setter: (t,v) => t.year = v }, //fix this after 9999 year ;)
-   {token: "M", formatter: d => ""+(d.getMonth()+1), setter: (t,v) => t.month = v-1 },
-   {token: "MM", formatter: d => leftPad(""+(d.getMonth()+1), 2, "0"), setter: (t,v) => t.month = v-1 },
-   {token: "D", formatter: d => ""+d.getDate(), setter: (t,v) => t.day = v },
-   {token: "DD", formatter: d => leftPad(""+d.getDate(), 2, "0"), setter: (t,v) => t.day = v },
-   {token: "H", formatter: d => ""+d.getHours(), setter: (t,v) => t.hour = v },
-   {token: "HH", formatter: d => leftPad(""+d.getHours(), 2, "0"), setter: (t,v) => t.hour = v },
-   {token: "m", formatter: d => ""+d.getMinutes(), setter: (t,v) => t.minute = v },
-   {token: "mm", formatter: d => leftPad(""+d.getMinutes(), 2, "0"), setter: (t,v) => t.minute = v },
-   {token: "s", formatter: d => ""+d.getSeconds(), setter: (t,v) => t.second = v },
-   {token: "ss", formatter: d => leftPad(""+d.getSeconds(), 2, "0"), setter: (t,v) => t.second = v },
+   {token: "YYYY", formatter: d => ""+d.getFullYear(), setter: (t,v) => t.year = v, kind: TokenKind.Year },
+   {token: "YY", formatter: d => (""+d.getFullYear()).substr(2), setter: (t,v) => t.year = v, kind: TokenKind.Year }, //fix this after 9999 year ;)
+   {token: "MM", formatter: d => leftPad(""+(d.getMonth()+1), 2, "0"), setter: (t,v) => t.month = v-1, kind: TokenKind.Month },
+   {token: "DD", formatter: d => leftPad(""+d.getDate(), 2, "0"), setter: (t,v) => t.day = v, kind: TokenKind.Day },
+   {token: "HH", formatter: d => leftPad(""+d.getHours(), 2, "0"), setter: (t,v) => t.hour = v, kind: TokenKind.Hour },
+   {token: "mm", formatter: d => leftPad(""+d.getMinutes(), 2, "0"), setter: (t,v) => t.minute = v, kind: TokenKind.Minute },
+   {token: "ss", formatter: d => leftPad(""+d.getSeconds(), 2, "0"), setter: (t,v) => t.second = v, kind: TokenKind.Second },
 ];
 
 enum TokenType {
@@ -70,6 +69,12 @@ function tokenize(format: string) {
       format = format.substr(match.token.length);
    }
    return result;
+}
+
+export function findLayout(format: string) {
+   return tokenize(format)
+      .map(i => (i.type === TokenType.DatePart ? i.part.kind : undefined) as TokenKind)
+      .filter(i => i !== undefined);
 }
 
 const dateLookup: {[letter: string]: IDatePart[]} = {};

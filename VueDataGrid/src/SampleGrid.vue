@@ -1,5 +1,18 @@
 <template>
    <div>
+      <div class="dg-grid">
+         <!-- <time-display v-model="sampleDate" format="HH.mm.ss">
+         </time-display> -->
+         <div class="dg-time-display">
+            <scroll-panel>
+               <div>
+                  <div v-for="(item, index) in data" :key="index">
+                     {{item.f1}}
+                  </div>
+               </div>
+            </scroll-panel>
+         </div>
+      </div>
       <div id="sample">
          <!-- :filters="{filters: [{field: 'f2', value: 'b3'}, {field: 'f2', value: 'b4'}]}" -->
          <!--<data-grid 
@@ -25,7 +38,7 @@
             :sortable="canSort">
             <data-column field="status" name="Status" :values="statuses"></data-column>
             <data-column field="status" :template="renderStatus"></data-column>
-            <data-column field="fDate" name="Date" type="date" head-template="head-off" :filter="true" format-options="YYYY-MM-DD!"></data-column>
+            <data-column field="fDate" name="Date" type="dateTime" head-template="head-off" :filter="true" format-options="YYYY-MM-DD!"></data-column>
             <data-column field="f3" name="bool" type="bool" :filter="true"></data-column>
             <data-column width="20%" :field="column.field" :name.sync="column.name" v-for="column in columns" :key="column.id" template="field-tpl"></data-column>
             <data-column name="Commands" template="commands-tpl" width="150px" icon="fa fa-address-book"></data-column>
@@ -68,6 +81,8 @@
 <script lang="ts">
 import Vue,{ CreateElement } from 'vue';
 import DatePicker from './components/DatePicker'
+import TimeDisplay from './components/TimeDisplay'
+import ScrollPanel from './components/ScrollPanel'
 import "./index";
 
 export default Vue.extend({
@@ -113,7 +128,9 @@ export default Vue.extend({
       };
    },
    components: {
-      DatePicker
+      DatePicker,
+      TimeDisplay,
+      ScrollPanel
    },
    methods: {
       rowClass(item: any) {

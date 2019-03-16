@@ -10,7 +10,7 @@ interface IThis extends Vue {
 }
 
 export default Vue.extend({
-   name: "BoolFilter",
+   name: "DateFilter",
    props: {
       value: { type: Array, default: () => [] },
       fieldName: { type: String },
