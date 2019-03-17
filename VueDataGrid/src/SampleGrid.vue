@@ -1,17 +1,9 @@
 <template>
    <div>
       <div class="dg-grid">
-         <!-- <time-display v-model="sampleDate" format="HH.mm.ss">
-         </time-display> -->
-         <div class="dg-time-display">
-            <scroll-panel :value="50">
-               <div>
-                  <div v-for="(item, index) in data" :key="index">
-                     {{item.f1}}
-                  </div>
-               </div>
-            </scroll-panel>
-         </div>
+         <time-display v-model="sampleDate" format="HH:mm:ss">
+         </time-display>
+         {{sampleDate}}
       </div>
       <div id="sample">
          <!-- :filters="{filters: [{field: 'f2', value: 'b3'}, {field: 'f2', value: 'b4'}]}" -->

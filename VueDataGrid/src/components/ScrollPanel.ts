@@ -37,7 +37,7 @@ export default Vue.extend({
          on: {
             wheel: (e: MouseWheelEvent) => {
                e.preventDefault();
-               this.vOffset += Math.round(e.deltaY/10);
+               this.vOffset += Math.round(e.deltaY > 10 ? e.deltaY/10 : e.deltaY);
                this.$emit("input", this.vOffset);
             },
          },
@@ -75,10 +75,12 @@ export default Vue.extend({
                      const maxBarOffset = containerHeight - bar.clientHeight;
 
                      const moveHandler = (ev: MouseEvent) => {
+                        e.stopImmediatePropagation();
+                        e.preventDefault();
                         const delta = ev.pageY-startPos;
                         const percent = delta/maxBarOffset;
-                        console.log(percent);
                         this.vOffset = startOffset + Math.round(percent*maxContentOffset);
+                        this.$emit("input", this.vOffset);
                      };
 
                      let endHandler: (ev: MouseEvent) => void;

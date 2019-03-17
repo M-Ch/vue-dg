@@ -277,11 +277,14 @@
 
 .dg-time-display {
    @partWidth: 30px;
-   @itemHeight: 20px;
-   @margin: 10px;
+   @partMargin: 1px;
+   @itemSize: 24px;
+   @containerHeight: 5*@itemSize;
+
+   position: relative;
 
    .dg-time(@count) {
-      width: 2*@margin+@count*@partWidth;
+      width: @count*(@partWidth+2*@partMargin);
    }
 
    &.dg-time-1 {
@@ -300,19 +303,50 @@
       list-style: none;
       margin: 0;
       padding: 0;
+      margin-top: 2*@itemSize;
+      margin-bottom: 2*@itemSize;
    }
 
-   .dg-time-slider {
-      width: @partWidth;
-      height: 5*@itemHeight;
-      overflow-y: hidden;
-      overflow-x: hidden;
-      display: inline-block;
+   li {
+      display: block;
+      height: @itemSize;
+      width: @itemSize;
+      text-align: center;
+      border-radius: 5px;
+      cursor: pointer;
+      padding: 2px;
+      line-height: @itemSize - 4px;
+      user-select: none;
+      box-sizing: border-box;
+
+      &:hover {
+         background: #dadada;
+      }
+   }
+
+   .dg-part-selected {
+      font-weight: bold;
+   }
+
+   .dg-select-indicator {
+      position: absolute;
+      left: 0;
+      right: 0;
+      top: 2*@itemSize;
+      height: @itemSize - 1px;
+      z-index: 100;
+      border-top: 1px solid #606060;
+      border-bottom: 1px solid #606060;
+      background: transparent;
+      pointer-events: none;
    }
 
    .dg-scroll-panel {
-      height: 5*@itemHeight;
+      height: @containerHeight;
       width: @partWidth;
+      margin-left: @partMargin;
+      margin-right: @partMargin;
+      display: inline-block;
    }
 }
 
