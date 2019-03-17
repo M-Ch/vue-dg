@@ -1,6 +1,7 @@
 import Vue, { VNode } from "vue";
 import { getCalendar } from '@/Config';
 import { range } from '@/linq';
+import "./CalendarDisplay.less";
 
 interface IThis extends Vue {
    value: Date;

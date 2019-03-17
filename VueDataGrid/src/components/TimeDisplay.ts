@@ -4,6 +4,7 @@ import { findLayout, TokenKind } from "@/DateFormat";
 import { range } from '@/linq';
 import { leftPad } from "@/StringFormat";
 import ScrollPanel from "./ScrollPanel";
+import "./TimeDisplay.less";
 
 interface IThis extends Vue {
    format: string;

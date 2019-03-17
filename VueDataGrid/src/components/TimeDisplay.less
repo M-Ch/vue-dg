@@ -1,0 +1,74 @@
+.dg-time-display {
+   @partWidth: 30px;
+   @partMargin: 1px;
+   @itemSize: 24px;
+   @containerHeight: 5*@itemSize;
+
+   position: relative;
+
+   .dg-time(@count) {
+      width: @count*(@partWidth+2*@partMargin);
+   }
+
+   &.dg-time-1 {
+      .dg-time(1);
+   }
+
+   &.dg-time-2 {
+      .dg-time(2);
+   }
+
+   &.dg-time-3 {
+      .dg-time(3);
+   }
+
+   ul {
+      list-style: none;
+      margin: 0;
+      padding: 0;
+      margin-top: 2*@itemSize;
+      margin-bottom: 2*@itemSize;
+   }
+
+   li {
+      display: block;
+      height: @itemSize;
+      width: @itemSize;
+      text-align: center;
+      border-radius: 5px;
+      cursor: pointer;
+      padding: 2px;
+      line-height: @itemSize - 4px;
+      user-select: none;
+      box-sizing: border-box;
+
+      &:hover {
+         background: #dadada;
+      }
+   }
+
+   .dg-part-selected {
+      font-weight: bold;
+   }
+
+   .dg-select-indicator {
+      position: absolute;
+      left: 0;
+      right: 0;
+      top: 2*@itemSize;
+      height: @itemSize - 1px;
+      z-index: 100;
+      border-top: 1px solid #606060;
+      border-bottom: 1px solid #606060;
+      background: transparent;
+      pointer-events: none;
+   }
+
+   .dg-scroll-panel {
+      height: @containerHeight;
+      width: @partWidth;
+      margin-left: @partMargin;
+      margin-right: @partMargin;
+      display: inline-block;
+   }
+}

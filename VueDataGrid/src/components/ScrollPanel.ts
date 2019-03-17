@@ -1,4 +1,5 @@
 import Vue from 'vue';
+import "./ScrollPanel.less";
 
 interface IThis extends Vue {
    vOffset: number;

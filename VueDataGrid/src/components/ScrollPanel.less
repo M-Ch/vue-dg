@@ -1,0 +1,35 @@
+
+.dg-scroll-panel {
+   overflow: hidden;
+   @scrollWidth: 5px;
+   position: relative;
+
+   > div {
+      display: inline-block;
+   }
+
+   &:hover .dg-scroll-track div {
+      opacity: 1;
+   }
+
+   .dg-scroll-track {
+      width: @scrollWidth;
+      right: 0;
+      top: 0;
+      bottom: 0;
+      position: absolute;
+
+      div {
+         width: @scrollWidth;
+         height: 12px;
+         border-radius: 5px;
+         background: #dadada;
+         transition: background-color .25s ease, opacity .25s ease;
+         opacity: 0;
+
+         &:hover {
+            background: #a0a0a0;
+         }
+      }
+   }
+}
