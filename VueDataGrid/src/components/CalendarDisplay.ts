@@ -44,6 +44,10 @@ export default Vue.extend({
       const year = date.getFullYear();
       const month = date.getMonth();
 
+      const selectedTime = this.value
+         ? new Date(this.value.getFullYear(), this.value.getMonth(), this.value.getDate()).getTime()
+         : 0;
+
       const renderDays = () => {
          const layout = range(0, 7).select(i => (settings.weekStart+i) % 7).toList();
 
@@ -56,6 +60,7 @@ export default Vue.extend({
          const dayCount = monthEnd.getDate();
          const cells = range(-fromPrev, dayCount+fromPrev+fromNext).select(i => {
             const current = new Date(year, month, 1+i);
+            const isSelected = selectedTime === current.getTime();
             if(this.value) {
                current.setHours(this.value.getHours());
                current.setMinutes(this.value.getMinutes());
@@ -67,7 +72,7 @@ export default Vue.extend({
                return i >= dayCount ? "dg-next" : null;
             })();
             return h("li", {
-               class: cssClass,
+               class: [cssClass, isSelected ? "dg-date-selected" : null],
                on: {
                   click: (e: Event) => {
                      e.stopPropagation();
