@@ -1,6 +1,6 @@
 import Vue from "vue";
 import { getCalendar } from "@/Config";
-import { findLayout, TokenKind } from "@/DateFormat";
+import { findLayout, TokenKind, today } from "@/DateFormat";
 import { range } from '@/linq';
 import { leftPad } from "@/StringFormat";
 import ScrollPanel from "./ScrollPanel";
@@ -50,7 +50,7 @@ export default Vue.extend({
    },
    methods: {
       snapItems(this: IThis) {
-         const value = this.value ? this.value : new Date(2000, 0, 1);
+         const value = this.value ? this.value : today();
          const item = this.$el.querySelector("li") as HTMLElement;
          const itemSize = item.clientHeight;
          this.offsets = parts.map(i => ({
@@ -65,7 +65,7 @@ export default Vue.extend({
          .map(i => parts.find(j => j.kind === i) as IValuePart)
          .filter(i => i !== undefined);
 
-      const getCurrent = () => this.value ? this.value : new Date(2000, 0, 1);
+      const getCurrent = () => this.value ? this.value : today();
       const raw = getCurrent();
 
       const renderValue = (part: IValuePart) => {
@@ -87,8 +87,8 @@ export default Vue.extend({
                   const actual = part.getter(current);
                   const candidate = offset/itemSize;
                   const newValue = candidate >= actual
-                     ? Math.ceil(candidate)
-                     : Math.floor(candidate);
+                     ? Math.min(actual+1, Math.ceil(candidate))
+                     : Math.max(actual-1, Math.floor(candidate));
 
                   const clamped = Math.max(0, Math.min(newValue, part.count-1));
                   if(part.getter(current) === clamped)
@@ -103,6 +103,10 @@ export default Vue.extend({
                class: value === i ? "dg-part-selected" : null,
                on: {
                   click: () => {
+                     if(value === i) {
+                        this.$emit("accept");
+                        return;
+                     }
                      const result = new Date(getCurrent());
                      part.setter(result, i);
                      this.$emit("input", result);
@@ -113,7 +117,10 @@ export default Vue.extend({
       };
 
       return h("div", {
-         class: ["dg-time-display", `dg-time-${layout.length}`]
+         class: ["dg-time-display", `dg-time-${layout.length}`],
+         on: {
+            click: (e: Event) => e.stopPropagation()
+         }
       }, [
          ...layout.map(i => renderValue(i)),
          h("div", { class: "dg-select-indicator" })

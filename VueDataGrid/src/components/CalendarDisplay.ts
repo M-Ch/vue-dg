@@ -2,6 +2,7 @@ import Vue, { VNode } from "vue";
 import { getCalendar } from '@/Config';
 import { range } from '@/linq';
 import "./CalendarDisplay.less";
+import { today } from '@/DateFormat';
 
 interface IThis extends Vue {
    value: Date;
@@ -37,7 +38,7 @@ export default Vue.extend({
       const date = (() => {
          if(this.editValue)
             return this.editValue;
-         return this.value ? this.value : new Date();
+         return this.value ? this.value : today();
       })();
       const settings = getCalendar();
       const year = date.getFullYear();
@@ -55,6 +56,11 @@ export default Vue.extend({
          const dayCount = monthEnd.getDate();
          const cells = range(-fromPrev, dayCount+fromPrev+fromNext).select(i => {
             const current = new Date(year, month, 1+i);
+            if(this.value) {
+               current.setHours(this.value.getHours());
+               current.setMinutes(this.value.getMinutes());
+               current.setSeconds(this.value.getSeconds());
+            }
             const cssClass = (() => {
                if(i < 0)
                   return "dg-prev";

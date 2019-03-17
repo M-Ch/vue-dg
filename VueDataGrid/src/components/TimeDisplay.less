@@ -3,8 +3,14 @@
    @partMargin: 1px;
    @itemSize: 24px;
    @containerHeight: 5*@itemSize;
+   @margin: 10px;
 
    position: relative;
+   user-select: none;
+   border: 1px solid black;
+   background: white;
+   padding-left: @margin;
+   padding-right: @margin;
 
    .dg-time(@count) {
       width: @count*(@partWidth+2*@partMargin);
@@ -31,14 +37,15 @@
    }
 
    li {
+      @padding: 2px;
       display: block;
       height: @itemSize;
       width: @itemSize;
       text-align: center;
       border-radius: 5px;
       cursor: pointer;
-      padding: 2px;
-      line-height: @itemSize - 4px;
+      padding: @padding;
+      line-height: @itemSize - 2*@padding;
       user-select: none;
       box-sizing: border-box;
 
@@ -53,8 +60,8 @@
 
    .dg-select-indicator {
       position: absolute;
-      left: 0;
-      right: 0;
+      left: @margin;
+      right: @margin;
       top: 2*@itemSize;
       height: @itemSize - 1px;
       z-index: 100;

@@ -71,6 +71,11 @@ function tokenize(format: string) {
    return result;
 }
 
+export function today() {
+   const value = new Date();
+   return new Date(value.getFullYear(), value.getMonth(), value.getDate());
+}
+
 export function findLayout(format: string) {
    return tokenize(format)
       .map(i => (i.type === TokenType.DatePart ? i.part.kind : undefined) as TokenKind)
@@ -87,6 +92,24 @@ export function formatDate(date: Date, format: string): string {
    return tokenize(format)
       .map(i => i.type === TokenType.DatePart ? i.part.formatter(date) : i.value)
       .join("");
+}
+
+export function positionKind(position: number, format: string) {
+   let start = 0;
+   let kind: TokenKind | null = null;
+   for(const part of tokenize(format)) {
+      const value = part.type === TokenType.Const
+         ? part.value
+         : part.part.token;
+      if(part.type === TokenType.DatePart)
+         kind = part.part.kind;
+      if(position >= start + value.length) {
+         start += value.length;
+         continue;
+      }
+      return kind;
+   }
+   return kind;
 }
 
 //checks if specified char value can be placed at given position when using specified format

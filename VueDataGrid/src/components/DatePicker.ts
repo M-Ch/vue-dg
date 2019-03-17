@@ -1,6 +1,7 @@
 import Vue from "vue";
 import * as dt from "../DateFormat";
 import CalendarDisplay from "./CalendarDisplay";
+import TimeDisplay from "./TimeDisplay";
 
 interface IThis extends Vue {
    value: Date;
@@ -35,7 +36,7 @@ export default Vue.extend({
       return {
          editValue: "",
          editIndex: null,
-         popupValue: new Date(),
+         popupValue: this.value ? this.value : dt.today(),
          clickListener: null,
          popupVisible: false,
       };
@@ -50,7 +51,8 @@ export default Vue.extend({
       };
    },
    components: {
-      CalendarDisplay
+      CalendarDisplay,
+      TimeDisplay
    },
    watch: {
       popupVisible(this: IThis) {
@@ -193,22 +195,45 @@ export default Vue.extend({
             }
          }
       });
+
       return h("div", { class: "dg-date-input" }, [
          textInput,
          this.popupVisible
-            ? h("CalendarDisplay", {
-               props: {
-                  value: this.popupValue
-               },
-               on: {
-                  input: (value: Date) => {
-                     this.popupValue = value;
-                     this.$emit("input", this.popupValue);
-                     this.editValue = dt.formatDate(this.popupValue, this.format);
-                     this.popupVisible = false;
-                  }
-               }
-            })
+            ? (() => {
+                  const tokenKind = dt.positionKind(this.editIndex, this.format);
+                  if(tokenKind === null)
+                     return null;
+                  const isTime = tokenKind === dt.TokenKind.Hour || tokenKind === dt.TokenKind.Minute || tokenKind === dt.TokenKind.Second;
+                  if(isTime)
+                     return h("TimeDisplay", {
+                        props: {
+                           value: this.popupValue,
+                           format: this.format
+                        },
+                        on: {
+                           input: (value: Date) => {
+                              this.popupValue = value;
+                              this.$emit("input", this.popupValue);
+                              this.editValue = dt.formatDate(this.popupValue, this.format);
+                           },
+                           accept: () => this.popupVisible = false
+                        }
+                     });
+
+                  return h("CalendarDisplay", {
+                     props: {
+                        value: this.popupValue
+                     },
+                     on: {
+                        input: (value: Date) => {
+                           this.popupValue = value;
+                           this.$emit("input", this.popupValue);
+                           this.editValue = dt.formatDate(this.popupValue, this.format);
+                           this.popupVisible = false;
+                        }
+                     }
+                  });
+               })()
             : null
       ]);
    }

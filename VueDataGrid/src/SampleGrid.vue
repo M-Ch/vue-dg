@@ -1,9 +1,6 @@
 <template>
    <div>
       <div class="dg-grid">
-         <time-display v-model="sampleDate" format="HH:mm:ss">
-         </time-display>
-         {{sampleDate}}
       </div>
       <div id="sample">
          <!-- :filters="{filters: [{field: 'f2', value: 'b3'}, {field: 'f2', value: 'b4'}]}" -->

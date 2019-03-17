@@ -73,7 +73,7 @@
             }
          }
 
-         [data-component='DateFilter'] {
+         [data-component='DateFilter'], [data-component='DateTimeFilter'] {
             .dg-date-filter > div {
                margin-top: 5px; 
                display: block;
@@ -201,9 +201,18 @@
 
 .dg-date-input {
    position: relative;
+   display: inline-block;
+
    .dg-calendar {
       position: absolute;
       left: 0;
+      top: 20px;
+      z-index: 1000;
+   }
+
+   .dg-time-display {
+      position: absolute;
+      right: 0;
       top: 20px;
       z-index: 1000;
    }
@@ -230,10 +239,22 @@
    .row-border() {
       border-bottom: 1px solid @borderColor;
    }
-   
-   .dg-calendar {
+
+   .popup-shadow() {
       border: 1px solid @borderColor;
       box-shadow: 0px 0px 5px 0px rgba(0,0,0,0.22);
+   }
+
+   .dg-time-display {
+      .popup-shadow();
+
+      .dg-part-selected {
+         color: darken(@headerText, 25%);
+      }
+   }
+   
+   .dg-calendar {
+      .popup-shadow();
 
       ul.dg-sub-header {
          li {
