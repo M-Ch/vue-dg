@@ -25,6 +25,7 @@ interface IMethods extends IListener {
    resetSelection: () => void;
    selectAll: () => void;
    fetchSource: () => void;
+   findColumns: () => IDataColumn[];
 }
 
 interface IData {
@@ -66,6 +67,7 @@ interface IThis extends Vue, IMethods, IData {
    selectionMode: SelectionMode;
    checkboxes: boolean;
    keepSelection: boolean;
+   fieldInfos: ds.IFieldInfo[];
 }
 
 export default Vue.extend({
@@ -166,6 +168,7 @@ export default Vue.extend({
      rowClass: { type: Function },
      filters: {},
      detailsTemplate: { default: null },
+     fieldInfos: { type: Array, default: null },
      theme: { type: String, default: "dg-light" }
    },
    methods: cast<IMethods>({
@@ -197,6 +200,17 @@ export default Vue.extend({
          this.vSelectedIds = this.vSelectedIds.slice().concat(toAdd.map(i => i[this.idField]));
          this.$emit("update:selectedIds", this.vSelectedIds);
          this.$emit("update:selected", this.selected ? this.selected.slice().concat(toAdd) : toAdd);
+      },
+      findColumns(this: IThis) {
+         const nodes = this.$slots.default;
+         if(nodes === undefined)
+            return [];
+         return chain(nodes)
+            .where(i => i.tag !== undefined && i.tag.endsWith(DataColumn))
+            .select(i => i.componentOptions && i.componentOptions.propsData ? i.componentOptions.propsData : null)
+            .where(i => i !== null)
+            .cast<IDataColumn>()
+            .toList();
       },
       updateSelection(this: IThis, item: any) {
          const id = item[this.idField];
@@ -271,6 +285,20 @@ export default Vue.extend({
                .select(i => ({ filters: [i.getValue()] }))
                .toList();
 
+            const infos = chain(Array.isArray(this.fieldInfos) ? this.fieldInfos : [] as ds.IFieldInfo[])
+               .select(i => ({ field: i.field, dataType: i.dataType }))
+               .where(i => !!i.field)
+               .toList();
+            const lookup: {[key: string]: boolean} = {};
+            infos.forEach(i => lookup[i.field] = true);
+
+            this.findColumns()
+               .filter(i => i.field && !lookup[i.field])
+               .forEach(i => infos.push({
+                  dataType: i.type,
+                  field: i.field as string
+               }));
+
             const request: ds.IDataRequest = {
                sorting: this.vSorting,
                page: this.vPage,
@@ -280,7 +308,8 @@ export default Vue.extend({
                   .concat(dataGroups)
                   .concat(dataFilters)
                   .concat(externalFilters())
-                  .toList()
+                  .toList(),
+               fields: infos
             };
             this.vDataSource
                .load(request)
@@ -313,36 +342,26 @@ export default Vue.extend({
    }),
    render(this: IThis, h) {
 
-      const findColumns = () => {
-         const nodes = this.$slots.default;
-         if(nodes === undefined)
-            return [];
-         return chain(nodes)
-            .where(i => i.tag !== undefined && i.tag.endsWith(DataColumn))
-            .select(i => i.componentOptions && i.componentOptions.propsData ? i.componentOptions.propsData : null)
-            .where(i => i !== null)
-            .cast<IDataColumn>()
-            .select(i => {
-               function buildLookup() {
-                  if(!i.values)
-                     return null;
-                  if(!Array.isArray(i.values))
-                     return null;
-                  if(i.values.length === 0)
-                     return null;
-                  if(typeof i.values[0] === "string" || typeof i.values[0] === "number")
-                     return null;
-                  const lookup: {[key: string]: string} = {};
-                  (i.values as IKeyValuePair[]).forEach(j => lookup[j.key] = j.value);
-                  return lookup;
-               }
-               return {
-                  definition: i,
-                  values: buildLookup()
-               } as IColumnBinding;
-            })
-            .toList();
-      };
+      const findColumns = () => this.findColumns()
+         .map(i => {
+            function buildLookup() {
+               if(!i.values)
+                  return null;
+               if(!Array.isArray(i.values))
+                  return null;
+               if(i.values.length === 0)
+                  return null;
+               if(typeof i.values[0] === "string" || typeof i.values[0] === "number")
+                  return null;
+               const lookup: {[key: string]: string} = {};
+               (i.values as IKeyValuePair[]).forEach(j => lookup[j.key] = j.value);
+               return lookup;
+            }
+            return {
+               definition: i,
+               values: buildLookup()
+            } as IColumnBinding;
+         });
 
       const sorting: {[key: string]: ds.SortDirection} = {};
       this.vSorting.forEach(i => sorting[i.field] = i.direction ? i.direction : ds.SortDirection.Asc);

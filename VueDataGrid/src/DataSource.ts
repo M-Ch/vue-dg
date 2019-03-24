@@ -39,11 +39,17 @@ export interface ISortField {
    direction: SortDirection;
 }
 
+export interface IFieldInfo {
+   field: string;
+   dataType: string | undefined;
+}
+
 export interface IDataRequest {
    page: number;
    pageSize: number;
    sorting: ISortField[];
    filters: IFilterGroup[];
+   fields: IFieldInfo[];
 }
 
 export class DataPromise {

@@ -33,12 +33,16 @@ export function mapData(result: any): IDataPage {
 export function buildUrl(url: string, request: IDataRequest): IUrlSet {
    const filterGroups = request.filters.map(group => group.filters.map(filter => {
       const operator = operatorOrDefault(filter.operator);
+      const fieldInfo = request.fields.find(i => i.field === filter.field);
+
       function formatValue(value: any) {
          if(value instanceof Date)
             return `DateTime'${formatDate(value, "YYYY-MM-DDTHH:mm:ss")}'`;
-         return typeof value === "number"
-            ? value
-            : `'${value}'`;
+         if(typeof value !== "number")
+            return `'${value}'`;
+         if(fieldInfo && fieldInfo.dataType === "decimal")
+            return value+"m";
+         return value;
       }
       if(operator === FilterOperator.NotEqals)
          return `not(${filter.field} eq ${formatValue(filter.value)})`;

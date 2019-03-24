@@ -196,20 +196,28 @@ addType("date", {
    filterComponent: "DateFilter"
 });
 
-addType("decimal", {
-   formatter: (value, options) => {
-      if(value === 0)
-         return "0";
-      if(!value)
-         return "";
-      if(!options)
-         return formatNumber(value, settings.decimalPrecision, settings.thousandSeparator, settings.decimalSeparator);
+function decimalFormatter(value: any, options: any) {
+   if(value === 0)
+   return "0";
+   if(!value)
+      return "";
+   if(!options)
+      return formatNumber(value, settings.decimalPrecision, settings.thousandSeparator, settings.decimalSeparator);
 
-      return formatNumber(value,
-         options.precision !== undefined ? options.precision : settings.decimalPrecision,
-         options.thousand !== undefined ? options.thousand : settings.thousandSeparator,
-         options.separator !== undefined ? options.separator : settings.decimalSeparator);
-   },
+   return formatNumber(value,
+      options.precision !== undefined ? options.precision : settings.decimalPrecision,
+      options.thousand !== undefined ? options.thousand : settings.thousandSeparator,
+      options.separator !== undefined ? options.separator : settings.decimalSeparator);
+}
+
+addType("decimal", {
+   formatter: decimalFormatter,
+   filterComponent: "NumericRangeFilter",
+   filterParams: { decimal: true } as INumericRangeParams,
+});
+
+addType("double", {
+   formatter: decimalFormatter,
    filterComponent: "NumericRangeFilter",
    filterParams: { decimal: true } as INumericRangeParams,
 });
