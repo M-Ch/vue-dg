@@ -4,6 +4,7 @@ import BoolFilter from "./BoolFilter";
 import DateFilter from "./DateFilter";
 import DateTimeFilter from "./DateTimeFilter";
 import ValueListFilter from "./ValueListFilter";
+import NumericRangeFilter from "./NumericRangeFilter";
 import { localize } from '@/Config';
 
 interface IThis extends Vue {
@@ -11,6 +12,7 @@ interface IThis extends Vue {
    opened: boolean;
    filterComponent: string;
    filterOptions: any;
+   filterParams: any;
    fieldName: string;
    workingValue: IFilterGroup[];
    clickListener: () => void;
@@ -22,7 +24,8 @@ export default Vue.extend({
       value: { type: Array, default: () => [] },
       fieldName: { type: String },
       filterComponent: { type: String },
-      filterOptions: { }
+      filterOptions: { },
+      filterParams: { },
    },
    mounted(this: IThis) {
       this.clickListener = () => {
@@ -73,6 +76,7 @@ export default Vue.extend({
                   props: {
                      value: this.workingValue,
                      options: this.filterOptions,
+                     params: this.filterParams,
                      fieldName: this.fieldName
                   },
                   on: {
@@ -108,6 +112,7 @@ export default Vue.extend({
    components: {
       BoolFilter,
       DateFilter,
+      NumericRangeFilter,
       DateTimeFilter,
       ValueListFilter
    },

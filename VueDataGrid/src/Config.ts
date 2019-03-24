@@ -1,11 +1,13 @@
 import { VNode, CreateElement } from 'vue';
 import { formatDate } from "./DateFormat";
 import { formatNumber } from "./NumberFormat";
+import { INumericRangeParams } from "./components/NumericRangeFilter";
 
 interface ITypeConfig {
    name: string;
    formatter?: (value: any, options: any, h: CreateElement) => string | VNode;
    filterComponent?: string;
+   filterParams: any;
 }
 
 export interface ILang {
@@ -131,13 +133,15 @@ export function setLanguage(lang: ILang) {
 export interface ITypeDefinition {
    formatter?: (value: any, options: any, h: CreateElement) => string | VNode;
    filterComponent?: string;
+   filterParams?: any;
 }
 
 export function addType(name: string, definition: ITypeDefinition) {
    types[name] = {
       name,
       formatter: definition.formatter,
-      filterComponent: definition.filterComponent
+      filterComponent: definition.filterComponent,
+      filterParams: definition.filterParams
    };
 }
 
@@ -154,8 +158,10 @@ export function getFormatter(typeName: string | undefined | null): (value: any, 
 export function getFilterComponent(typeName: string | undefined | null) {
    if(!typeName || !types[typeName])
       return null;
-   const candidate = types[typeName].filterComponent;
-   return candidate ? candidate : null;
+   const candidate = types[typeName];
+   return candidate && candidate.filterComponent 
+      ? { component: candidate.filterComponent, params: candidate.filterParams } 
+      : null;
 }
 
 type LangKey = keyof ILang;
@@ -204,6 +210,8 @@ addType("decimal", {
          options.thousand !== undefined ? options.thousand : settings.thousandSeparator,
          options.separator !== undefined ? options.separator : settings.decimalSeparator);
    },
+   filterComponent: "NumericRangeFilter",
+   filterParams: { decimal: true } as INumericRangeParams,
 });
 
 addType("int", {
@@ -220,6 +228,8 @@ addType("int", {
          options.thousand !== undefined ? options.thousand : settings.thousandSeparator,
          options.separator !== undefined ? options.separator : settings.decimalSeparator);
    },
+   filterComponent: "NumericRangeFilter",
+   filterParams: { decimal: false } as INumericRangeParams,
 });
 
 addType("dateTime", {

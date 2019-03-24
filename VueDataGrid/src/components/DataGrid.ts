@@ -360,9 +360,9 @@ export default Vue.extend({
             return null;
          if(value === true) {
             const component = getFilterComponent(dataType);
-            return component != null ? {filter: component, options: null } : null;
+            return component != null ? {filter: component.component, params: component.params, options: null } : null;
          }
-         return {filter: value, options: null };
+         return {filter: value, options: null, params: null };
       }
 
       const hasCheckboxes = this.selectionMode === SelectionMode.Multi && this.checkboxes;
@@ -375,7 +375,7 @@ export default Vue.extend({
          const columnSorting = column.field ? sorting[column.field] : null;
          const filterValue = column.filter === undefined ? true : column.filter;
          const filterComponent = this.filterable && filterValue
-            ? (column.values ? {filter: "ValueListFilter", options: column.values as any } : findFilter(column.type, filterValue))
+            ? (column.values ? {filter: "ValueListFilter", options: column.values as any, params: null } : findFilter(column.type, filterValue))
             : null;
          const content = [
             title,
@@ -385,6 +385,7 @@ export default Vue.extend({
                   value: columnFilters[column.field],
                   fieldName: column.field,
                   filterComponent: filterComponent ? filterComponent.filter : null,
+                  filterParams: filterComponent ? filterComponent.params : null,
                   filterOptions: filterComponent ? filterComponent.options : null
                },
                on: {

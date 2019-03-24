@@ -83,6 +83,25 @@
             }
          }
 
+         .dg-numeric-range-filter {
+            input[type="text"] {
+               text-align: right;
+            }
+
+            & > div {
+               margin-top: 5px; 
+               display: block;
+            }
+
+
+         }
+
+         [data-component='NumericRangeFilter'] {
+            & + .dg-popup-actions {
+               margin-top: 5px;
+            }
+         }
+
          [data-component='ValueListFilter'] {
             .dg-value-list { 
                min-width: 150px 

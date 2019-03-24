@@ -39,7 +39,7 @@ export default Vue.extend({
             },
             on: {
                input: (value: number) => {
-                  const candidate = value-1;
+                  const candidate = value >= 1 ? value-1 : 0;
                   this.$emit("input", candidate >= this.pageCount
                      ? this.pageCount -1
                      : (candidate < 0 ? 0 : candidate));
