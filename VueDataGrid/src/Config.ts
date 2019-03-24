@@ -25,6 +25,7 @@ export interface ILang {
    dropdownLabel: string;
    rangeFrom: string;
    rangeTo: string;
+   containsValue: string;
 }
 
 const types: {[key: string]: ITypeConfig } = {};
@@ -43,6 +44,7 @@ let i18n: ILang = {
    dropdownLabel: "Select...",
    rangeFrom: "From:",
    rangeTo: "To:",
+   containsValue: "Contains value:"
 };
 
 export interface ICalendar {
@@ -220,6 +222,10 @@ addType("double", {
    formatter: decimalFormatter,
    filterComponent: "NumericRangeFilter",
    filterParams: { decimal: true } as INumericRangeParams,
+});
+
+addType("text", {
+   filterComponent: "TextFilter"
 });
 
 addType("int", {

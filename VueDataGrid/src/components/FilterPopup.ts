@@ -5,6 +5,7 @@ import DateFilter from "./DateFilter";
 import DateTimeFilter from "./DateTimeFilter";
 import ValueListFilter from "./ValueListFilter";
 import NumericRangeFilter from "./NumericRangeFilter";
+import TextFilter from "./TextFilter";
 import { localize } from '@/Config';
 
 interface IThis extends Vue {
@@ -114,6 +115,7 @@ export default Vue.extend({
       DateFilter,
       NumericRangeFilter,
       DateTimeFilter,
+      TextFilter,
       ValueListFilter
    },
 });

@@ -9,7 +9,7 @@
             source="http://localhost/VueDataGrid.Sample/odata/sampleSet" source-options="odata"
             :uri.sync="dataUri"
             :page-uri.sync="dataPage">
-            <data-column field="Name"></data-column>
+            <data-column field="Name" type="text"></data-column>
             <data-column field="Price" type="decimal"></data-column>
             <data-column field="Release" :filter="true" type="date"></data-column>
             <filter-field field="Name" value="a" operator="substr"></filter-field>
