@@ -117,9 +117,9 @@ export function addRemoteSource(name: string, factory: (baseUrl: string, request
          const urlSet = factory(url, request);
          const xhr = new XMLHttpRequest();
          xhr.onreadystatechange = () => {
-            onAlways();
             if(xhr.readyState !== XMLHttpRequest.DONE)
                return;
+            onAlways();
             if(xhr.status < 200 || xhr.status >= 300) {
                onError(xhr.status);
                return;
