@@ -17,6 +17,7 @@ interface IThis extends Vue {
    fieldName: string;
    workingValue: IFilterGroup[];
    clickListener: () => void;
+   closeListener: (e: Event) => void;
 }
 
 export default Vue.extend({
@@ -32,16 +33,32 @@ export default Vue.extend({
       this.clickListener = () => {
          this.opened = false;
       };
+      this.closeListener = (e: Event) => {
+         if(e instanceof CustomEvent && e.detail && e.detail.sender === this)
+            return;
+         this.opened = false;
+         e.stopPropagation();
+      };
       document.addEventListener("click", this.clickListener);
+      document.addEventListener("dg-filter-popup-close", this.closeListener);
    },
    beforeDestroy(this: IThis) {
       document.removeEventListener("click", this.clickListener);
+      document.removeEventListener("dg-filter-popup-close", this.closeListener);
    },
    data() {
       return {
          opened: false,
          workingValue: [],
       };
+   },
+   watch: {
+      opened(this: IThis) {
+         if(!this.opened)
+            return;
+         const ev = new CustomEvent("dg-filter-popup-close", { detail: { sender: this } });
+         document.dispatchEvent(ev);
+      }
    },
    render(this: IThis, h) {
       return h("div", {
