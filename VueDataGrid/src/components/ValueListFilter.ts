@@ -8,7 +8,17 @@ import { localize } from "../Config";
 interface IThis extends Vue {
    value: IFilterGroup[];
    fieldName: string;
-   options: IKeyValuePair[];
+   options: IKeyValuePair[] | number[] | string[];
+}
+
+function normalize(raw: IKeyValuePair[] | number[] | string[]): IKeyValuePair[] {
+   if(raw.length === 0)
+      return [];
+   if(typeof raw[0] === "string")
+      return (raw as string[]).map(i => ({ key: i, value: i }));
+   if(typeof raw[0] === "number")
+      return (raw as number[]).map(i => ({key: ""+i, value: ""+i }));
+   return raw as IKeyValuePair[];
 }
 
 export default Vue.extend({
@@ -24,7 +34,8 @@ export default Vue.extend({
       const selected: {[key: string]: boolean} = {};
       values.forEach(i => selected[i] = true);
       const nameLookup: {[key: string]: string} = {};
-      this.options.forEach(i => nameLookup[i.key] = i.value);
+      const normalized = normalize(this.options);
+      normalized.forEach(i => nameLookup[i.key] = i.value);
 
       const emitValue = (filterValues: string[]) => {
          const filter: IFilterGroup[] = filterValues.length ? [{
@@ -53,7 +64,7 @@ export default Vue.extend({
          ]);
       };
 
-      const availableOptions = chain(this.options)
+      const availableOptions = chain(normalized)
          .where(i => !selected[i.key])
          .toList();
 

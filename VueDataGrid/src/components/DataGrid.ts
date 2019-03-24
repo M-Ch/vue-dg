@@ -1,6 +1,6 @@
 import Vue,{ VNode, VNodeComponentOptions, VNodeData, CreateElement } from "vue";
 import { cast } from "./Grid";
-import { IDataColumn, DataColumn } from "./DataColumn";
+import { IDataColumn, DataColumn, IKeyValuePair } from "./DataColumn";
 import { getFormatter, getFilterComponent, getSettings } from "../Config";
 import buildSource, * as ds from "../DataSource";
 import { chain, range } from '@/linq';
@@ -326,8 +326,14 @@ export default Vue.extend({
                function buildLookup() {
                   if(!i.values)
                      return null;
+                  if(!Array.isArray(i.values))
+                     return null;
+                  if(i.values.length === 0)
+                     return null;
+                  if(typeof i.values[0] === "string" || typeof i.values[0] === "number")
+                     return null;
                   const lookup: {[key: string]: string} = {};
-                  i.values.forEach(j => lookup[j.key] = j.value);
+                  (i.values as IKeyValuePair[]).forEach(j => lookup[j.key] = j.value);
                   return lookup;
                }
                return {

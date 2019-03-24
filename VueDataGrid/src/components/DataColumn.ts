@@ -15,7 +15,7 @@ export interface IDataColumn {
    width?: string;
    type?: string;
    formatOptions?: any;
-   values?: IKeyValuePair[];
+   values?: IKeyValuePair[] | string[] | number[];
    icon?: string;
    filter?: string | boolean;
 }
