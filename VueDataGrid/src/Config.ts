@@ -1,5 +1,6 @@
-import { formatDate } from "./DateFormat";
 import { VNode, CreateElement } from 'vue';
+import { formatDate } from "./DateFormat";
+import { formatNumber } from "./NumberFormat";
 
 interface ITypeConfig {
    name: string;
@@ -98,6 +99,9 @@ export function setCalendar(calendar: any | ICalendar) {
 
 export interface ISettings {
    idField: string;
+   thousandSeparator: string;
+   decimalPrecision: number;
+   decimalSeparator: string;
 }
 
 export interface ISettingsArgs {
@@ -105,7 +109,10 @@ export interface ISettingsArgs {
 }
 
 const settings: ISettings = {
-   idField: "id"
+   idField: "id",
+   thousandSeparator: " ",
+   decimalPrecision: 2,
+   decimalSeparator: ","
 };
 
 export function setup(values: ISettingsArgs) {
@@ -181,6 +188,38 @@ addType("date", {
       return formatDate(date, typeof options === "string" ? options : calendarSettings.dateFormat);
    },
    filterComponent: "DateFilter"
+});
+
+addType("decimal", {
+   formatter: (value, options) => {
+      if(value === 0)
+         return "0";
+      if(!value)
+         return "";
+      if(!options)
+         return formatNumber(value, settings.decimalPrecision, settings.thousandSeparator, settings.decimalSeparator);
+
+      return formatNumber(value,
+         options.precision !== undefined ? options.precision : settings.decimalPrecision,
+         options.thousand !== undefined ? options.thousand : settings.thousandSeparator,
+         options.separator !== undefined ? options.separator : settings.decimalSeparator);
+   },
+});
+
+addType("int", {
+   formatter: (value, options) => {
+      if(value === 0)
+         return "0";
+      if(!value)
+         return "";
+      if(!options)
+         return formatNumber(value, 0, settings.thousandSeparator, settings.decimalSeparator);
+
+      return formatNumber(value,
+         0,
+         options.thousand !== undefined ? options.thousand : settings.thousandSeparator,
+         options.separator !== undefined ? options.separator : settings.decimalSeparator);
+   },
 });
 
 addType("dateTime", {

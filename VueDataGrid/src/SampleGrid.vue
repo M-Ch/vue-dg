@@ -4,16 +4,16 @@
       </div>
       <div id="sample">
          <!-- :filters="{filters: [{field: 'f2', value: 'b3'}, {field: 'f2', value: 'b4'}]}" -->
-         <!--<data-grid 
+         <data-grid 
             id-field="Id" 
             source="http://localhost/VueDataGrid.Sample/odata/sampleSet" source-options="odata"
             :uri.sync="dataUri"
             :page-uri.sync="dataPage">
             <data-column field="Name"></data-column>
-            <data-column field="Price"></data-column>
+            <data-column field="Price" type="decimal"></data-column>
             <data-column field="Release" :filter="true" type="date"></data-column>
             <filter-field field="Name" value="a" operator="substr"></filter-field>
-         </data-grid>-->
+         </data-grid>
          <data-grid 
             id-field="f1" 
             details-template="details-tpl"
