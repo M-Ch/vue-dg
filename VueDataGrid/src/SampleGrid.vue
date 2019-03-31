@@ -73,6 +73,10 @@ import DatePicker from './components/DatePicker'
 import TimeDisplay from './components/TimeDisplay'
 import ScrollPanel from './components/ScrollPanel'
 import "./index";
+import pl from "./i18n/pl-PL";
+import { setLocale } from "./Config";
+
+setLocale(pl);
 
 export default Vue.extend({
    name: "SampleGrid",

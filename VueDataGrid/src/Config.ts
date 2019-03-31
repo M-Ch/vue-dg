@@ -45,7 +45,7 @@ let i18n: ILang = {
    dropdownLabel: "Select...",
    rangeFrom: "From:",
    rangeTo: "To:",
-   containsValue: "Contains value:",
+   containsValue: "Contains:",
    valueEquals: "Equals:"
 };
 
@@ -91,13 +91,25 @@ const calendarSettings: ICalendar = {
    monthFirst: true
 };
 
+export interface ILocale {
+   calendar: ICalendar;
+   settings: ISettingsArgs;
+   text: ILang;
+}
+
+export function setLocale(locale: ILocale) {
+   setSettings(locale.settings);
+   setCalendar(locale.calendar);
+   setLanguage(locale.text);
+}
+
 export function getCalendar() {
    return calendarSettings;
 }
 
 export function setCalendar(calendar: any | ICalendar) {
    const target = calendarSettings as any;
-   for(const prop in Object.getOwnPropertyNames(calendar)) {
+   for(const prop of Object.getOwnPropertyNames(calendar)) {
       if(target[prop] !== undefined)
          target[prop] = calendar[prop];
    }
@@ -112,18 +124,24 @@ export interface ISettings {
 
 export interface ISettingsArgs {
    idField?: string;
+   thousandSeparator?: string;
+   decimalPrecision?: number;
+   decimalSeparator?: string;
 }
 
 const settings: ISettings = {
    idField: "id",
    thousandSeparator: " ",
    decimalPrecision: 2,
-   decimalSeparator: ","
+   decimalSeparator: "."
 };
 
-export function setup(values: ISettingsArgs) {
-   if(values.idField !== undefined)
-      settings.idField = values.idField;
+export function setSettings(values: any | ISettingsArgs) {
+   const target = settings as any;
+   for(const prop of Object.getOwnPropertyNames(values)) {
+      if(target[prop] !== undefined)
+         target[prop] = values[prop];
+   }
 }
 
 export function getSettings() {
@@ -202,7 +220,7 @@ addType("date", {
 
 function decimalFormatter(value: any, options: any) {
    if(value === 0)
-   return "0";
+      return "0";
    if(!value)
       return "";
    if(!options)

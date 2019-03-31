@@ -3,7 +3,7 @@ import DataGrid from "./components/DataGrid";
 import DataColumn from "./components/DataColumn";
 import FilterGroup from "./components/FilterGroup";
 import FilterField from "./components/FilterField";
-import { addType, setLanguage, setFilterComponent, setCalendar } from "./Config";
+import { addType, setLanguage, setFilterComponent, setCalendar, setSettings, setLocale } from "./Config";
 import { addSource, addRemoteSource, addXhrHook } from "./DataSource";
 import * as odata from "./OData";
 import * as kendo from "./KendoMvc";
@@ -24,8 +24,10 @@ const plugin = {
    addRemoteSource,
    addXhrHook,
    setCalendar,
+   setSettings,
    setFilterComponent,
-   setLanguage
+   setLanguage,
+   setLocale
 };
 
 addRemoteSource("odata", odata.buildUrl, odata.mapData);
