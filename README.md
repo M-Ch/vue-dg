@@ -3,7 +3,15 @@ Data grid for Vue.js with sorting, filtering, paging, templating and remote data
 Depends only on Vue.js.
 
 ## Installation
-`npm install vue-dg`
+1. Run: `npm install vue-dg`
+2. Import module:
+```js
+import DataGrid from "vue-dg";
+//optional locale:
+DataGrid.setLocale(DataGrid.locales.plPL);
+Vue.use(DataGrid);
+```
+3. Import css from: `dist\DataGrid.css`
 
 ## Features
 * Can bind to local data (array) or remote data (WebApi or Kendo DataSourceRequest)
