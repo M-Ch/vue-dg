@@ -338,8 +338,8 @@ export default Vue.extend({
                   .toList(),
                fields: infos
             };
-            this.vDataSource
-               .load(request)
+            const source = this.vDataSource.load(request);
+            new ds.DataPromise(source.resolver)
                .always(() => {
                   if(fetchId !== this.vFetchId)
                      return;

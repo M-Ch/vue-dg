@@ -52,6 +52,10 @@ export interface IDataRequest {
    fields: IFieldInfo[];
 }
 
+export interface IDataPromise {
+   resolver: (onSuccess: (data: any[], total: number, uri: string, pageUri: string) => void, onError: (error?: any) => void, onAlways: () => void) => void;
+}
+
 export class DataPromise {
 
    private onSuccess: (data: any[], total: number, uri: string, pageUri: string) => void = () => {};
@@ -84,7 +88,7 @@ export class DataPromise {
 }
 
 export interface IDataSource {
-   load: (request: IDataRequest) => DataPromise;
+   load: (request: IDataRequest) => IDataPromise;
    name: string;
 }
 
@@ -139,7 +143,7 @@ function normalize(data: any): any {
 export function addRemoteSource(name: string, factory: (baseUrl: string, request: IDataRequest) => IUrlSet, selector: (result: any) => IDataPage) {
    sources[name] = (url: string) => ({
       name,
-      load: (request) => new DataPromise((onSuccess, onError, onAlways) => {
+      load: (request) => ({ resolver: (onSuccess, onError, onAlways) => {
          const urlSet = factory(url, request);
          const xhr = new XMLHttpRequest();
          xhr.onreadystatechange = () => {
@@ -158,7 +162,7 @@ export function addRemoteSource(name: string, factory: (baseUrl: string, request
          xhr.open("GET", urlSet.pageUrl);
          xhrHooks.forEach(i => i(xhr));
          xhr.send();
-      })
+      } })
    });
 }
 
@@ -183,10 +187,10 @@ function emptySource(): IDataSource {
    return {
       name: "empty",
       load() {
-         return new DataPromise((onSuccess, _, onAlways) => {
+         return { resolver: (onSuccess, _, onAlways) => {
             onSuccess([], 0, "no-data", "no-data");
             onAlways();
-         });
+         } };
       }
    };
 }
@@ -219,7 +223,7 @@ function arraySource(values: any[]): IDataSource {
    return {
       name: "array",
       load(data) {
-         return new DataPromise((onSuccess, _, onAlways) => {
+         return { resolver: (onSuccess, _, onAlways) => {
             const isMatching = (row: any) => chain(data.filters)
                .all(group => chain(group.filters).any(filter => isRowMatching(row, filter)));
 
@@ -243,7 +247,7 @@ function arraySource(values: any[]): IDataSource {
             const result = copy.slice(data.page*data.pageSize, (data.page+1)*data.pageSize);
             onSuccess(result, copy.length, "local", "local");
             onAlways();
-         });
+         } };
       }
    };
 }
