@@ -58,14 +58,18 @@ export default Vue.extend({
                   return true;
                if(e.key >= "0" && e.key <= "9")
                   return true;
+               if(/F[0-9]{1,2}/.test(e.key))
+                  return true;
                if(e.key === "-" && !target.value)
                   return true;
                if(e.key === this.separator && this.float)
                   return target.value.indexOf(this.separator) === -1;
                if(validKeys[e.key])
                   return true;
-               if(e.key === "Enter")
+               if(e.key === "Enter") {
                   this.emitValue(target.value);
+                  return true;
+               }
                if(e.key === "Escape") {
                   this.emitValue(""+this.value);
                   target.value = ""+this.value;

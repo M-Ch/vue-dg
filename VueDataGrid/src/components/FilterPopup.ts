@@ -90,17 +90,31 @@ export default Vue.extend({
             }
          }, [
             h("div", {attrs: { "data-component": this.filterComponent } }, [
-               h(this.filterComponent, {
-                  props: {
-                     value: this.workingValue,
-                     options: this.filterOptions,
-                     params: this.filterParams,
-                     fieldName: this.fieldName
-                  },
+               h("form", {
                   on: {
-                     input: (value: IFilterGroup[]) => this.workingValue = value
+                     submit: (e: Event) => {
+                        e.preventDefault();
+                        this.$emit("input", this.workingValue);
+                        this.opened = false;
+                     }
                   }
-               })
+               }, [
+                     h(this.filterComponent, {
+                     props: {
+                        value: this.workingValue,
+                        options: this.filterOptions,
+                        params: this.filterParams,
+                        fieldName: this.fieldName
+                     },
+                     on: {
+                        input: (value: IFilterGroup[]) => this.workingValue = value
+                     }
+                  }),
+                  h("input", {
+                     domProps: { type: "submit" },
+                     style: { display: "none" }
+                  })
+               ])
             ]),
             h("div", { class: "dg-popup-actions" }, [
                h("a", {
