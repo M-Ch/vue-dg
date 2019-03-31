@@ -110,6 +110,32 @@ export function addXhrHook(hook: (xhr: XMLHttpRequest) => void) {
       xhrHooks.push(hook);
 }
 
+function normalize(data: any): any {
+   if(!data)
+      return data;
+   if(Array.isArray(data)) {
+      for(const item of data)
+         normalize(item);
+      return data;
+   }
+
+   if(typeof data === "object") {
+      for(const prop of Object.keys(data)) {
+         data[prop] = normalize(data[prop]);
+      }
+      return data;
+   }
+
+   if(typeof data === "string") {
+      const match = /^\/Date\(([0-9]+)\)\/$/.exec(data);
+      return match
+         ? new Date(parseInt(match[1], 10))
+         : data;
+   }
+
+   return data;
+}
+
 export function addRemoteSource(name: string, factory: (baseUrl: string, request: IDataRequest) => IUrlSet, selector: (result: any) => IDataPage) {
    sources[name] = (url: string) => ({
       name,
@@ -127,7 +153,7 @@ export function addRemoteSource(name: string, factory: (baseUrl: string, request
 
             const raw = JSON.parse(xhr.responseText);
             const result = selector ? selector(raw) : raw as IDataPage;
-            onSuccess(result.items, result.total, urlSet.dataUrl, urlSet.pageUrl);
+            onSuccess(normalize(result.items), result.total, urlSet.dataUrl, urlSet.pageUrl);
          };
          xhr.open("GET", urlSet.pageUrl);
          xhrHooks.forEach(i => i(xhr));
