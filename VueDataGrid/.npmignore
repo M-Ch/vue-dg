@@ -1,6 +1,5 @@
 .editorconfig
 .browserslistrc
-build.cmd
 tslint.json
 src/SampleGrid.vue
 node_modules
