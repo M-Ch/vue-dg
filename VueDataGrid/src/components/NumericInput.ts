@@ -45,6 +45,7 @@ export default Vue.extend({
 
          if(newValue !== this.value)
             this.$emit("input", newValue);
+         return newValue;
       }
    } as any,
    render(this: IThis, h) {
