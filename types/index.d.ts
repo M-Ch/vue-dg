@@ -132,6 +132,10 @@ export interface ILocale {
    text: ILang;
 }
 
+export interface ILocales {
+   plPL: ILocale
+}
+
 export interface IDataGrid {
     install(vue: VueConstructor): void;
 	addType(name: string, definition: ITypeDefinition): void;
@@ -142,7 +146,8 @@ export interface IDataGrid {
 	setSettings(values: ISettingsArgs): void;
 	setFilterComponent(typeName: string, filterComponent: string): void;
 	setLanguage(lang: ILang): void;
-	setLocale(locale: ILocale): void;
+   setLocale(locale: ILocale): void;
+   locales: ILocales;
 }
 
 declare const DataGrid: IDataGrid;

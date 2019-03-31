@@ -7,6 +7,11 @@ import { addType, setLanguage, setFilterComponent, setCalendar, setSettings, set
 import { addSource, addRemoteSource, addXhrHook } from "./DataSource";
 import * as odata from "./OData";
 import * as kendo from "./KendoMvc";
+import plPL from "./i18n/pl-PL";
+
+const locales = {
+   plPL
+};
 
 const components: {[key: string]: VueConstructor} = {
    DataGrid,
@@ -27,7 +32,8 @@ const plugin = {
    setSettings,
    setFilterComponent,
    setLanguage,
-   setLocale
+   setLocale,
+   locales
 };
 
 addRemoteSource("odata", odata.buildUrl, odata.mapData);
