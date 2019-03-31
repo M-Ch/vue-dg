@@ -1,6 +1,7 @@
 import Vue from "vue";
 import { IFilterGroup, FilterOperator } from "../DataSource";
 import { localize } from "../Config";
+import focus from "./FocusInput";
 
 interface IThis extends Vue {
    value: IFilterGroup[];
@@ -12,6 +13,9 @@ export default Vue.extend({
    props: {
       value: { type: Array, default: () => [] },
       fieldName: { type: String },
+   },
+   directives: {
+      focus: focus()
    },
    render(this: IThis, h) {
       const filter = this.value && this.value.length ? this.value[0].filters : null;
@@ -32,6 +36,9 @@ export default Vue.extend({
             domProps: {
                value: filterValue
             },
+            directives: [
+               { name: "focus" }
+            ],
             on: {
                input: (e: Event) => emitValue((e.target as HTMLInputElement).value)
             }

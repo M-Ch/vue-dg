@@ -3,6 +3,7 @@ import { IFilterGroup, FilterOperator } from "../DataSource";
 import { chain } from '@/linq';
 import { getSettings, localize } from "../Config";
 import NumericInput from "./NumericInput";
+import focus from "./FocusInput";
 
 interface IThis extends Vue {
    value: IFilterGroup[];
@@ -23,6 +24,9 @@ export default Vue.extend({
    },
    components: {
       NumericInput
+   },
+   directives: {
+      focus: focus()
    },
    render(this: IThis, h) {
       const filters = this.value && this.value.length ? this.value : [];
@@ -60,6 +64,9 @@ export default Vue.extend({
                   float: this.params.decimal,
                   separator: settings.decimalSeparator
                },
+               directives: [
+                  { name: "focus" }
+               ],
                on: {
                   input: (value: number) => {
                      emitValue(null, null, value);
