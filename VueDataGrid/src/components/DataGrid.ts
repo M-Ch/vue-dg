@@ -26,6 +26,7 @@ interface IMethods extends IListener {
    selectAll: () => void;
    fetchSource: () => void;
    findColumns: () => IDataColumn[];
+   bindReload: (eventName: string | null) => void;
 }
 
 interface IData {
@@ -39,6 +40,7 @@ interface IData {
    vSelectedIds: any[];
    vExpanded: {[id: string]: boolean };
    vIsLoading: boolean;
+   vReloadHandler: { name: string, handler: () => void } | null;
 }
 
 enum SelectionMode {
@@ -61,6 +63,7 @@ interface IThis extends Vue, IMethods, IData {
    filters: Array<ds.IFilterGroup | ds.IFilterValue> | ds.IFilterValue | ds.IFilterGroup;
    detailsTemplate: string | ((item: any, h: CreateElement) => string | VNode);
    rowClass: (item: any) => string | string[];
+   reloadEvent: string;
    idField: string;
    selectedIds: any[];
    selected: any[];
@@ -84,7 +87,8 @@ export default Vue.extend({
          vColumnFilters: self.columnFilters ? self.columnFilters : [],
          vSelectedIds: self.selectedIds ? self.selectedIds : [],
          vExpanded: {},
-         vIsLoading: false
+         vIsLoading: false,
+         vReloadHandler: null
       });
    },
    mounted(this: IThis) {
@@ -92,10 +96,17 @@ export default Vue.extend({
          this.resetSelection();
       }
       this.switchPage(this.page, true, true);
+      this.bindReload(this.reloadEvent);
+   },
+   beforeDestroy(this: IThis) {
+      this.bindReload(null);
    },
    watch: {
       page(this: IThis) {
          this.switchPage(this.page);
+      },
+      reloadEvent(this: IThis) {
+         this.bindReload(this.reloadEvent);
       },
       filters(this: IThis) {
          this.switchPage(this.page);
@@ -150,6 +161,7 @@ export default Vue.extend({
    props: {
      page: { type: Number, default: 0 },
      pageSize: { type: Number, default: 10 },
+     reloadEvent: { type: String, default: "grid:reload" },
      source: { default: null },
      sourceOptions: { default: null },
      isLoading: { type: Boolean, default: false },
@@ -180,6 +192,21 @@ export default Vue.extend({
          this.vPage = page;
          this.$emit("update:page", page);
          this.fetchSource();
+      },
+      bindReload(this: IThis, name: string | null) {
+         const context = this.$vnode.context;
+         if(!context)
+            return;
+         if(this.vReloadHandler != null)
+            context.$off(this.vReloadHandler.name, this.vReloadHandler.handler);
+         if(!name)
+            return;
+
+         this.vReloadHandler = {
+            name,
+            handler: () => this.switchPage(this.vPage, true)
+         };
+         context.$on(name, this.vReloadHandler.handler);
       },
       onValueSignaled(this: IThis) {
          //caled when data group filters have changed

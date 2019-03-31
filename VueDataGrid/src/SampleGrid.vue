@@ -8,6 +8,7 @@
             id-field="Id" 
             source="http://localhost/VueDataGrid.Sample/odata/sampleSet" source-options="odata"
             :uri.sync="dataUri"
+            :reload-event="evName"
             :page-uri.sync="dataPage">
             <data-column field="Name" type="text"></data-column>
             <data-column field="Price" type="decimal"></data-column>
@@ -50,9 +51,11 @@
          </data-grid>
       </div>
       <button v-on:click="append">switch page</button>
+      <button v-on:click="reload">reload</button>
       <button v-on:click="filters = []">change test: {{withFilter}}</button>
       <div>{{dataUri}}</div>
       <div>{{dataPage}}</div>
+      <input type="text" v-model="evName"/>
    </div>
 </template>
 
@@ -94,6 +97,7 @@ export default Vue.extend({
             { field: "f2", value: "b5" }
          ],
          page: 0,
+         evName: "grid:reload",
          pageSize: 5,
          columns: [
             { name: "a", id: 1, field: "f2" },
@@ -137,6 +141,9 @@ export default Vue.extend({
       },
       append() {
          this.page++;
+      },
+      reload() {
+         this.$emit("grid:reload");
       },
       itemAction(item: any) {
          alert(item.f3);
