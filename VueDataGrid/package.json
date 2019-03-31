@@ -1,16 +1,31 @@
 {
-  "name": "data-grid",
-  "version": "0.1.0",
-  "private": true,
+  "name": "vue-dg",
+  "description": "Data grid for Vue.js with sorting, filtering, paging, templating and remote data loading.",
+  "version": "1.0.0",
+  "private": false,
   "scripts": {
     "serve": "vue-cli-service serve",
     "build": "vue-cli-service build",
     "lint": "vue-cli-service lint",
-    "bundle": "vue-cli-service build --target lib --name dataGrid ./src/index.ts"
+    "bundle": "vue-cli-service build --target lib --name DataGrid ./src/index.ts"
   },
+  "homepage": "https://github.com/M-Ch/vue-dg",
+  "main": "dist/dataGrid.common.js",
   "dependencies": {
     "vue": "^2.5.17"
   },
+  "author": {
+   "name": "Marcin Chwalek"
+ },
+  "bugs": {
+   "url": "https://github.com/M-Ch/vue-dg/issues"
+ },
+ "license": "MIT",
+ "typings": "types/index.d.ts",
+ "repository": {
+   "type": "git",
+   "url": "git+https://github.com/M-Ch/vue-dg.git"
+ },
   "devDependencies": {
     "@vue/cli-plugin-typescript": "^3.2.0",
     "@vue/cli-service": "^3.2.0",
