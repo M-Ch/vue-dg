@@ -92,8 +92,6 @@
                margin-top: 5px; 
                display: block;
             }
-
-
          }
 
          [data-component='NumericFilter'], [data-component='TextFilter'] {
@@ -321,6 +319,13 @@
             .dg-value-list { 
                padding: @padding;
             };
+         }
+
+         .dg-numeric-filter {
+            > div:first-child {
+               border-bottom: 1px solid @borderColor;
+               padding-bottom: 10px;
+            }
          }
       }
 

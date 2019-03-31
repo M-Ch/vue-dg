@@ -28,11 +28,13 @@ export default Vue.extend({
       const filters = this.value && this.value.length ? this.value : [];
       const fromFilter = filters.find(i => i.tag === "range-from");
       const toFilter = filters.find(i => i.tag === "range-to");
+      const equalsFilter = filters.find(i => i.tag === "value-equals");
 
-      const emitValue = (from: number | null, to: number | null) => {
+      const emitValue = (from: number | null, to: number | null, equals: number | null) => {
          const newFilters = chain([
-            {emit: !!from, value: from, tag: "range-from", operator: FilterOperator.GraterThanOrEqual },
-            {emit: !!to, value: to, tag: "range-to", operator: FilterOperator.LowerThanOrEqual }
+            {emit: equals === null && !!from, value: from, tag: "range-from", operator: FilterOperator.GraterThanOrEqual },
+            {emit: equals === null && !!to, value: to, tag: "range-to", operator: FilterOperator.LowerThanOrEqual },
+            {emit: equals !== null, value: equals, tag: "value-equals", operator: FilterOperator.Equals },
          ])
             .where(i => i.emit)
             .select<IFilterGroup>(i => ({
@@ -51,6 +53,21 @@ export default Vue.extend({
 
       return h("div", { class: "dg-numeric-filter" }, [
          h("div", [
+            localize("valueEquals"),
+            h("NumericInput", {
+               props: {
+                  value: equalsFilter ? equalsFilter.filters[0].value : null,
+                  float: this.params.decimal,
+                  separator: settings.decimalSeparator
+               },
+               on: {
+                  input: (value: number) => {
+                     emitValue(null, null, value);
+                  }
+               }
+            })],
+         ),
+         h("div", [
             localize("rangeFrom"),
             h("NumericInput", {
                props: {
@@ -60,7 +77,7 @@ export default Vue.extend({
                },
                on: {
                   input: (value: number) => {
-                     emitValue(value, toFilter ? toFilter.filters[0].value as number : null);
+                     emitValue(value, toFilter ? toFilter.filters[0].value as number : null, null);
                   }
                }
             })
@@ -76,7 +93,7 @@ export default Vue.extend({
             },
             on: {
                input: (value: number) => {
-                  emitValue(fromFilter ? fromFilter.filters[0].value as number : null, value);
+                  emitValue(fromFilter ? fromFilter.filters[0].value as number : null, value, null);
                }
             }
          })],
