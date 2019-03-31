@@ -1,7 +1,7 @@
 import { VNode, CreateElement } from 'vue';
 import { formatDate } from "./DateFormat";
 import { formatNumber } from "./NumberFormat";
-import { INumericRangeParams } from "./components/NumericRangeFilter";
+import { INumericFilterParams } from "./components/NumericFilter";
 
 interface ITypeConfig {
    name: string;
@@ -214,14 +214,14 @@ function decimalFormatter(value: any, options: any) {
 
 addType("decimal", {
    formatter: decimalFormatter,
-   filterComponent: "NumericRangeFilter",
-   filterParams: { decimal: true } as INumericRangeParams,
+   filterComponent: "NumericFilter",
+   filterParams: { decimal: true } as INumericFilterParams,
 });
 
 addType("double", {
    formatter: decimalFormatter,
-   filterComponent: "NumericRangeFilter",
-   filterParams: { decimal: true } as INumericRangeParams,
+   filterComponent: "NumericFilter",
+   filterParams: { decimal: true } as INumericFilterParams,
 });
 
 addType("text", {
@@ -242,8 +242,8 @@ addType("int", {
          options.thousand !== undefined ? options.thousand : settings.thousandSeparator,
          options.separator !== undefined ? options.separator : settings.decimalSeparator);
    },
-   filterComponent: "NumericRangeFilter",
-   filterParams: { decimal: false } as INumericRangeParams,
+   filterComponent: "NumericFilter",
+   filterParams: { decimal: false } as INumericFilterParams,
 });
 
 addType("dateTime", {

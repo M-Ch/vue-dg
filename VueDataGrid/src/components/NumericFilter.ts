@@ -7,15 +7,15 @@ import NumericInput from "./NumericInput";
 interface IThis extends Vue {
    value: IFilterGroup[];
    fieldName: string;
-   params: INumericRangeParams;
+   params: INumericFilterParams;
 }
 
-export interface INumericRangeParams {
+export interface INumericFilterParams {
    decimal: boolean;
 }
 
 export default Vue.extend({
-   name: "NumericRangeFilter",
+   name: "NumericFilter",
    props: {
       value: { type: Array, default: () => [] },
       fieldName: { type: String },
@@ -49,7 +49,7 @@ export default Vue.extend({
 
       const settings = getSettings();
 
-      return h("div", { class: "dg-numeric-range-filter" }, [
+      return h("div", { class: "dg-numeric-filter" }, [
          h("div", [
             localize("rangeFrom"),
             h("NumericInput", {

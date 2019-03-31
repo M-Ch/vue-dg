@@ -4,7 +4,7 @@ import BoolFilter from "./BoolFilter";
 import DateFilter from "./DateFilter";
 import DateTimeFilter from "./DateTimeFilter";
 import ValueListFilter from "./ValueListFilter";
-import NumericRangeFilter from "./NumericRangeFilter";
+import NumericFilter from "./NumericFilter";
 import TextFilter from "./TextFilter";
 import { localize } from '@/Config';
 
@@ -130,7 +130,7 @@ export default Vue.extend({
    components: {
       BoolFilter,
       DateFilter,
-      NumericRangeFilter,
+      NumericFilter,
       DateTimeFilter,
       TextFilter,
       ValueListFilter
