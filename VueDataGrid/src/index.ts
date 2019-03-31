@@ -5,7 +5,8 @@ import FilterGroup from "./components/FilterGroup";
 import FilterField from "./components/FilterField";
 import { addType, setLanguage, setFilterComponent, setCalendar } from "./Config";
 import { addSource, addRemoteSource, addXhrHook } from "./DataSource";
-import { mapData, buildUrl } from "./OData";
+import * as odata from "./OData";
+import * as kendo from "./KendoMvc";
 
 const components: {[key: string]: VueConstructor} = {
    DataGrid,
@@ -27,6 +28,7 @@ const plugin = {
    setLanguage
 };
 
-addRemoteSource("odata", buildUrl, mapData);
+addRemoteSource("odata", odata.buildUrl, odata.mapData);
+addRemoteSource("kendo-mvc", kendo.buildUrl, kendo.mapData);
 
 export default plugin;
