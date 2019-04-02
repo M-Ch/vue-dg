@@ -66,7 +66,7 @@ export function buildUrl(url: string, request: IDataRequest): IUrlSet {
    ].filter(i => i.value).map(i => `${i.name}=${i.value}`).join("&");
 
    const dataUrl = `${url}?${vars}`;
-   const joinSymbol = vars ? "&" : "?";
+   const joinSymbol = vars ? "&" : "";
    const page = request.page+1;
 
    return {
