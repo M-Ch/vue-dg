@@ -10,6 +10,7 @@ export interface IDataColumn {
    name?: string;
    field?: string;
    template?: string | ((value: any, item: any, h: CreateElement) => string | VNode);
+   render?: ((value: any, item: any, h: CreateElement) => string | VNode);
    headTemplate?: string;
    sortable?: boolean;
    width?: string;
@@ -32,6 +33,7 @@ export default Vue.extend({
       sortDir: { type: String, default: "asc" },
       field: { type: String },
       sortable: { type: Boolean, default: true },
+      render: {},
       filter: { default: true },
       width: { type: String },
       type: { type: String },

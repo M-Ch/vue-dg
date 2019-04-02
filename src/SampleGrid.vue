@@ -133,6 +133,9 @@ export default Vue.extend({
       rowClass(item: any) {
          return item.status === 1 ? "danger" : null;
       },
+      doRender(value: any) {
+         return "test: "+value;
+      },
       renderStatus(value: number, item: any, h: CreateElement) {
          return h("b", ""+value);
       },

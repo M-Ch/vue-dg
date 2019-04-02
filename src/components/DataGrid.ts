@@ -520,6 +520,9 @@ export default Vue.extend({
       const renderCell = (data: any, binding: IColumnBinding) => {
          const column = binding.definition;
          const buildContent = () => {
+            if(column.render) {
+               return column.render(column.field ? data[column.field] : null, data, h);
+            }
             if(!column.template) {
                if(!column.field) {
                   logError("Data column has no field and no template defined. It will be always empty.");
