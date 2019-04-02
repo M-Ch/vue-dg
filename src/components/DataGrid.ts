@@ -88,12 +88,22 @@ export default Vue.extend({
          vSelectedIds: self.selectedIds ? self.selectedIds : [],
          vExpanded: {},
          vIsLoading: false,
-         vReloadHandler: null
+         vReloadHandler: null,
       });
    },
    mounted(this: IThis) {
       if(this.selectionMode === SelectionMode.None) {
          this.resetSelection();
+      }
+      if(!Array.isArray(this.vSorting) || this.vSorting.length === 0) {
+         this.vSorting = this.findColumns()
+            .filter(i => i.sortOrder !== null && i.sortOrder !== undefined && i.field)
+            .sort((a,b) => (a.sortOrder as number) - (b.sortOrder as number))
+            .map(i => ({
+               field: i.field as string,
+               direction: i.sortDir === "desc" ? ds.SortDirection.Desc : ds.SortDirection.Asc
+            }));
+         this.$emit("update:sorting", this.vSorting);
       }
       this.switchPage(this.page, true, true);
       this.bindReload(this.reloadEvent);

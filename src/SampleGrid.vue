@@ -11,8 +11,8 @@
             :reload-event="evName"
             :page-uri.sync="dataPage">
             <data-column field="Name" type="text"></data-column>
-            <data-column field="Release" width="80%" :filter="true" type="date"></data-column>
-            <data-column field="Price" width="20" type="decimal"></data-column>
+            <data-column field="Release" width="80%" :filter="true" type="date" :sort-order="1"></data-column>
+            <data-column field="Price" width="20" type="decimal" :sort-order="0"></data-column>
             <filter-field field="Name" value="a" operator="substr"></filter-field>
          </data-grid>
          <data-grid 

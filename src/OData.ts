@@ -21,7 +21,7 @@ function mapDirection(direction: SortDirection) {
    if(direction === SortDirection.Desc)
       return "desc";
    throw {message: `Unknown odata sort direction: ${direction}` };
-   }
+}
 
 export function mapData(result: any): IDataPage {
    return {

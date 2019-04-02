@@ -18,6 +18,8 @@ export interface IDataColumn {
    values?: IKeyValuePair[] | string[] | number[];
    icon?: string;
    filter?: string | boolean;
+   sortOrder?: number;
+   sortDir?: "asc" | "desc";
 }
 
 export default Vue.extend({
@@ -26,6 +28,8 @@ export default Vue.extend({
       name: { type: String },
       template: { },
       headTemplate: { type: String },
+      sortOrder: { type: Number },
+      sortDir: { type: String, default: "asc" },
       field: { type: String },
       sortable: { type: Boolean, default: true },
       filter: { default: true },
