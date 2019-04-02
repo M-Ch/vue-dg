@@ -173,11 +173,9 @@
          }
       }
 
-      input { 
-         &[type="text"] {
-            padding: 2px 4px;
-            border-radius: 2px;
-         }
+      input[type="text"], select {
+         padding: 4px;
+         border-radius: 3px;
       }
    }
 
@@ -445,19 +443,21 @@
 
    .dg-body {
 
+      @color: #ecf6ff;
+
       tr {
          transition: background-color .25s ease;
 
          &:hover {
-            background-color: #f8fafc;
+            background-color: #d3e3f1;
          }
 
          &.dg-selected {
-            background-color: #f0f3f7;
+            background-color: darken(@color, 10%);
          }
 
          &.dg-selected:hover {
-            background-color: #ecf2fa;
+            background-color: #aec4da;
          }
 
          &.dg-details-row {
