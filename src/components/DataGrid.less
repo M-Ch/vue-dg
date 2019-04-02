@@ -315,9 +315,16 @@
          position: absolute;
          top: 20px;
          padding: @padding;
-         left: 0;
          background: white;
          box-shadow: 0px 0px 5px 0px rgba(0,0,0,0.62);
+
+         &.dg-side-right {
+            right: 0;
+         }
+
+         &.dg-side-left {
+            left: 0;
+         }
 
          [data-component='ValueListFilter'] {
             .dg-value-list { 

@@ -11,8 +11,8 @@
             :reload-event="evName"
             :page-uri.sync="dataPage">
             <data-column field="Name" type="text"></data-column>
-            <data-column field="Price" type="decimal"></data-column>
-            <data-column field="Release" :filter="true" type="date"></data-column>
+            <data-column field="Release" width="80%" :filter="true" type="date"></data-column>
+            <data-column field="Price" width="20" type="decimal"></data-column>
             <filter-field field="Name" value="a" operator="substr"></filter-field>
          </data-grid>
          <data-grid 
@@ -61,7 +61,7 @@
 
 <style>
    #sample {
-      width: 75%;
+      width: 100%;
       margin: 0 auto;
       margin-top: 150px;
       margin-bottom: 150px;

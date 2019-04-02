@@ -87,7 +87,10 @@ export default Vue.extend({
                   e.stopPropagation();
                   document.dispatchEvent(new Event("dg-date-picker-close"));
                }
-            }
+            },
+            directives: [
+               { name: "adjustSide" }
+            ]
          }, [
             h("div", {attrs: { "data-component": this.filterComponent } }, [
                h("form", {
@@ -140,6 +143,15 @@ export default Vue.extend({
             ])
          ]) : null
       ]);
+   },
+   directives: {
+      adjustSide: {
+         inserted(el: HTMLElement) {
+            const minOffset = el.clientWidth*1.25;
+            const box = el.getBoundingClientRect();
+            el.classList.add(window.innerWidth-box.left > minOffset ? "dg-side-left" : "dg-side-right");
+         }
+      }
    },
    components: {
       BoolFilter,
