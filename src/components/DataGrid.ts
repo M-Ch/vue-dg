@@ -175,7 +175,7 @@ export default Vue.extend({
      source: { default: null },
      sourceOptions: { default: null },
      isLoading: { type: Boolean, default: false },
-     idField: { type: String, default: getSettings().idField },
+     idField: { type: String, default: () => getSettings().idField },
      sorting: { type: Array, default: () => [] },
      selectedIds: { type: Array, default: () => [] },
      selected: { type: Array, default: () => [] },
