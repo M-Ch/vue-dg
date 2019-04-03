@@ -386,7 +386,7 @@ export default Vue.extend({
       }
    }),
    render(this: IThis, h) {
-
+      const hasDetails = !!this.detailsTemplate;
       const findColumns = () => this.findColumns()
          .map(i => {
             function buildLookup() {
@@ -498,8 +498,6 @@ export default Vue.extend({
       this.vSelectedIds.forEach(i => {
          selected[""+i] = true;
       });
-
-      const hasDetails = !!this.detailsTemplate;
 
       if(hasDetails)
          headerCells.splice(0, 0, h("th", { class: "dg-details" }));
@@ -642,10 +640,12 @@ export default Vue.extend({
       };
 
       const cols = columns.map(i => h("col", { style: { width: i.definition.width ? i.definition.width : undefined } }));
+      if(hasDetails)
+         cols.unshift(h("col", { style: { width: "5px" } }));
       const thead = h("thead", {class: "dg-head"}, [h("tr", {}, headerCells)]);
       const dataRows = chain(this.vPageData).selectMany(renderRow).toList();
       const tbody = h("tbody", { class: "dg-body" }, dataRows);
-      const dataTable = h("table", { class: "dg-table" }, [cols, thead, tbody]);
+      const dataTable = h("table", { class: "dg-table" }, [h("colgroup", {}, cols), thead, tbody]);
 
       const slot = h("div", { class: "dg-hidden" }, this.$slots.default ? this.$slots.default : []);
       const pager = h("pager", {
