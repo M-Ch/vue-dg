@@ -41,6 +41,8 @@ interface IData {
    vExpanded: {[id: string]: boolean };
    vIsLoading: boolean;
    vReloadHandler: { name: string, handler: () => void } | null;
+   vUri: string | null;
+   vPageUri: string | null;
 }
 
 enum SelectionMode {
@@ -89,6 +91,8 @@ export default Vue.extend({
          vExpanded: {},
          vIsLoading: false,
          vReloadHandler: null,
+         vUri: null,
+         vPageUri: null
       });
    },
    mounted(this: IThis) {
@@ -362,6 +366,8 @@ export default Vue.extend({
                    this.vPageData = [];
                    this.$emit("update:uri", null);
                    this.$emit("update:pageUri", null);
+                   this.vUri = null;
+                   this.vPageUri = null;
                    this.vTotal = 0;
                })
                .success((data, total, uri, pageUri) => {
@@ -372,6 +378,8 @@ export default Vue.extend({
                   this.vTotal = total;
                   this.$emit("update:uri", uri);
                   this.$emit("update:pageUri", pageUri);
+                  this.vUri = uri;
+                  this.vPageUri = pageUri;
                })
                .fetch();
          });
