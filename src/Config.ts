@@ -169,7 +169,7 @@ export function addType(name: string, definition: ITypeDefinition) {
 
 export function getFormatter(typeName: string | undefined | null): (value: any, options: any, h: CreateElement) => string | VNode {
    function defaultFormatter(value: any) {
-      return value !== undefined || value !== null ? ""+value : "";
+      return value !== undefined && value !== null ? ""+value : "";
    }
    if(!typeName || !types[typeName])
       return defaultFormatter;
