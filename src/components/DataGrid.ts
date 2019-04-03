@@ -434,7 +434,7 @@ export default Vue.extend({
       const headerCells = columns.map(data => {
          const column = data.definition;
          const headTpl = column.headTemplate ? this.$scopedSlots[column.headTemplate] : null;
-         const title = headTpl ? headTpl(column) : column.name ? column.name : column.field;
+         const title = headTpl ? headTpl(column) : column.title ? column.title : column.field;
          const canSort = this.sortable && (column.sortable || column.sortable === undefined) && column.field;
          const columnSorting = column.field ? sorting[column.field] : null;
          const filterValue = column.filter === undefined ? true : column.filter;

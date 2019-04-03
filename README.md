@@ -33,12 +33,12 @@ Vue.use(DataGrid);
    :row-class="rowClass"
    :page-size="pageSize" 
    :sortable="canSort">
-   <data-column field="status" name="Status" :template="customStatusTemplate"></data-column>
-   <data-column field="date" name="Date" type="dateTime" head-template="headTemplate" :filter="true" format-options="YYYY-MM-DD!"></data-column>
-   <data-column field="canBeSold" name="bool" type="bool" :filter="true"></data-column>
+   <data-column field="status" title="Status" :template="customStatusTemplate"></data-column>
+   <data-column field="date" title="Date" type="dateTime" head-template="headTemplate" :filter="true" format-options="YYYY-MM-DD!"></data-column>
+   <data-column field="canBeSold" title="bool" type="bool" :filter="true"></data-column>
    <!-- columns can be defined with v-for and can be changed anytime -->
-   <data-column width="20%" :field="column.field" :name="column.name" v-for="column in columns" :key="column.id" template="field-tpl"></data-column>
-   <data-column name="Commands" template="commands-tpl" width="150px" icon="fa fa-address-book"></data-column>
+   <data-column width="20%" :field="column.field" :title="column.name" v-for="column in columns" :key="column.id" template="field-tpl"></data-column>
+   <data-column title="Commands" template="commands-tpl" width="150px" icon="fa fa-address-book"></data-column>
    <!-- header can be defined with slot -->
    <div slot="headTemplate" slot-scope="column">
       <b>header-tpl: {{column.name}}</b>

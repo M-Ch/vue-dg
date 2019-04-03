@@ -7,7 +7,7 @@ export interface IKeyValuePair {
 }
 
 export interface IDataColumn {
-   name?: string;
+   title?: string;
    field?: string;
    template?: string | ((value: any, item: any, h: CreateElement) => string | VNode);
    render?: ((value: any, item: any, h: CreateElement) => string | VNode);
@@ -26,7 +26,7 @@ export interface IDataColumn {
 export default Vue.extend({
    name: DataColumn,
    props: {
-      name: { type: String },
+      title: { type: String },
       template: { },
       headTemplate: { type: String },
       sortOrder: { type: Number },
