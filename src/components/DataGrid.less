@@ -448,9 +448,10 @@
 
       tr {
          transition: background-color .25s ease;
+         background-color: white;
 
          &:hover {
-            background-color: #d3e3f1;
+            background-color: #d3e3f1 !important;
          }
 
          &.dg-selected {
@@ -458,12 +459,16 @@
          }
 
          &.dg-selected:hover {
-            background-color: #aec4da;
+            background-color: #aec4da !important;
          }
 
          &.dg-details-row {
             td { padding-left: 2*@padding;
             }
+         }
+
+         &:nth-child(odd) {
+            background-color: #f5fafd;
          }
       }
 
