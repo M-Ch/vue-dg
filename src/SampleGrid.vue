@@ -8,6 +8,7 @@
             id-field="Id" 
             source="http://localhost/VueDataGrid.Sample/odata/sampleSet" source-options="odata"
             :uri.sync="dataUri"
+            :pageable="false"
             :reload-event="evName"
             :page-uri.sync="dataPage">
             <data-column field="Name" type="text"></data-column>

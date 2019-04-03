@@ -58,6 +58,7 @@ interface IThis extends Vue, IMethods, IData {
    sourceOptions: any;
    sorting: ds.ISortField[];
    sortable: boolean;
+   pageable: boolean;
    canReload: boolean;
    filterable: boolean;
    theme: string;
@@ -185,6 +186,7 @@ export default Vue.extend({
      selected: { type: Array, default: () => [] },
      selectionMode: { type: String, default: SelectionMode.None },
      sortable: { type: Boolean, default: true },
+     pageable: { type: Boolean, default: true },
      filterable: { type: Boolean, default: true },
      keepSelection: { type: Boolean, default: false },
      checkboxes: { type: Boolean, default: true },
@@ -690,7 +692,7 @@ export default Vue.extend({
       }, [
          slot,
          dataTable,
-         h("div", { class: "dg-footer"}, [this.canReload ? reloadLink : null, pageList, pager]),
+         this.pageable ? h("div", { class: "dg-footer"}, [this.canReload ? reloadLink : null, pageList, pager]) : null,
          this.vIsLoading ? h("div", { class: "dg-loader"}) : null,
       ]);
    },
