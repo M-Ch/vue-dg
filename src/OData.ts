@@ -38,6 +38,8 @@ export function buildUrl(url: string, request: IDataRequest): IUrlSet {
       function formatValue(value: any) {
          if(value instanceof Date)
             return `DateTime'${formatDate(value, "YYYY-MM-DDTHH:mm:ss")}'`;
+         if(typeof value === "boolean")
+            return value ? "true" : "false";
          if(typeof value !== "number")
             return `'${value}'`;
          if(fieldInfo && fieldInfo.dataType === "decimal")
