@@ -187,6 +187,7 @@ export default Vue.extend({
                this.$nextTick(() => this.editIndex = input.selectionStart ? input.selectionStart : 0);
                this.popupVisible = true;
                e.stopPropagation();
+               e.preventDefault();
             },
             blur: (e: Event) => {
                const result = dt.tryParse(this.editValue, this.format);
@@ -196,7 +197,18 @@ export default Vue.extend({
          }
       });
 
-      return h("div", { class: "dg-date-input" }, [
+      return h("div", {
+         class: "dg-date-input",
+         on: {
+            click: (e: Event) => {
+               const input = e.target as HTMLInputElement;
+               this.$nextTick(() => this.editIndex = input.selectionStart ? input.selectionStart : 0);
+               this.popupVisible = true;
+               e.stopPropagation();
+               e.preventDefault();
+            }
+         }
+      }, [
          textInput,
          this.popupVisible
             ? (() => {
