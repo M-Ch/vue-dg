@@ -208,7 +208,7 @@ export default Vue.extend({
          this.fetchSource();
       },
       bindReload(this: IThis, name: string | null) {
-         const context = this.$vnode.context;
+         const context = this.$root;
          if(!context)
             return;
          if(this.vReloadHandler != null)
