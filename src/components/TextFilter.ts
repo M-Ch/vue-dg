@@ -34,7 +34,10 @@ export default Vue.extend({
          localize("containsValue"),
          h("input", {
             domProps: {
-               value: filterValue
+               value: filterValue,
+            },
+            attrs: {
+               type: "text",
             },
             directives: [
                { name: "focus" }
