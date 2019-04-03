@@ -26,13 +26,14 @@
    .icon-spin6:before { content: '\e839'; }
 
    font-family: Helvetica Neue, Helvetica, sans-serif;
-   font-size: 14px;
+   @fontSize: 13px;
+   font-size: @fontSize;
    position: relative;
 
    .dg-table {
       width: 100%;
       border-collapse: collapse;
-      font-size: 14px;
+      font-size: @fontSize;
 
       th.dg-selector {
          width: 10px;
