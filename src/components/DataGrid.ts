@@ -55,7 +55,7 @@ interface IThis extends Vue, IMethods, IData {
    page: number;
    pageSize: number;
    source: any;
-   sourceOptions: any;
+   type: any;
    sorting: ds.ISortField[];
    sortable: boolean;
    pageable: boolean;
@@ -84,7 +84,7 @@ export default Vue.extend({
       return cast<IData>({
          vPage: 0,
          vFetchId: 0,
-         vDataSource: buildSource(self.source, self.sourceOptions),
+         vDataSource: buildSource(self.source, self.type),
          vPageData: [],
          vSorting: self.sorting ? n.normalizeSorting(self.sorting) : [],
          vTotal: 0,
@@ -135,10 +135,10 @@ export default Vue.extend({
          this.switchPage(Math.floor(index/newValue), true);
       },
       source(this: IThis) {
-         this.vDataSource = buildSource(this.source, this.sourceOptions);
+         this.vDataSource = buildSource(this.source, this.type);
       },
       soureOptions(this: IThis) {
-         this.vDataSource = buildSource(this.source, this.sourceOptions);
+         this.vDataSource = buildSource(this.source, this.type);
       },
       selectionMode(this: IThis) {
          if(this.selectionMode === SelectionMode.None) {
@@ -182,7 +182,7 @@ export default Vue.extend({
      pageSize: { type: Number, default: 10 },
      reloadEvent: { type: String, default: "grid:reload" },
      source: { default: null },
-     sourceOptions: { default: null },
+     type: { default: null },
      sourceArgs: { default: null },
      isLoading: { type: Boolean, default: false },
      idField: { type: String, default: () => getSettings().idField },

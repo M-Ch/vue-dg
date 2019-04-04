@@ -29,7 +29,7 @@ Vue.use(DataGrid);
    selection-mode="single"
    :keep-selection="false" 
    source="odata/sample-data" 
-   source-options="odata"
+   type="odata"
    :row-class="rowClass"
    :page-size="pageSize" 
    :sortable="canSort">

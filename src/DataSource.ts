@@ -167,15 +167,15 @@ export function addRemoteSource(name: string, factory: (baseUrl: string, request
    });
 }
 
-export default function(source: any, sourceOptions: any) {
+export default function(source: any, sourceType: any) {
    if(!source)
       return emptySource();
 
    if(typeof source === "string") {
-      const builder = sources[sourceOptions];
+      const builder = sources[sourceType];
       if(builder)
          return builder(source);
-      throw { error: `Not supported data source type: ${sourceOptions}.` };
+      throw { error: `Not supported data source type: ${sourceType}.` };
    }
    if(Array.isArray(source)) {
       return arraySource(source);

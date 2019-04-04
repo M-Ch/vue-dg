@@ -6,7 +6,8 @@
          <!-- :filters="{filters: [{field: 'f2', value: 'b3'}, {field: 'f2', value: 'b4'}]}" -->
          <data-grid 
             id-field="Id" 
-            source="http://localhost/VueDataGrid.Sample/odata/sampleSet" source-options="odata"
+            source="http://localhost/VueDataGrid.Sample/odata/sampleSet" 
+            type="odata"
             :uri.sync="dataUri"
             :pageable="false"
             :reload-event="evName"
