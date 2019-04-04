@@ -30,6 +30,10 @@ export function mapData(result: any): IDataPage {
    };
 }
 
+interface IArgs {
+   vars: Array<{name: string, value: string | null }>;
+}
+
 export function buildUrl(url: string, request: IDataRequest): IUrlSet {
    const filterGroups = request.filters.map(group => group.filters.map((filter): string | null => {
       const operator = operatorOrDefault(filter.operator);
@@ -65,9 +69,18 @@ export function buildUrl(url: string, request: IDataRequest): IUrlSet {
 
    const sort = request.sorting.map(i => `${i.field} ${mapDirection(i.direction)}`).join(", ");
 
+   const customVars = (() => {
+      if(!request.args)
+         return [];
+      const typed = request.args as IArgs;
+      if(!Array.isArray(typed.vars))
+         return [];
+      return typed.vars;
+   })();
    const vars = [
       {name: "$filter", value: filters },
       {name: "$orderby", value: sort },
+      ...customVars
    ].filter(i => i.value).map(i => `${i.name}=${i.value}`).join("&");
 
    const dataUrl = `${url}?${vars}`;

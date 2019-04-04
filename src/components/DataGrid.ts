@@ -65,6 +65,7 @@ interface IThis extends Vue, IMethods, IData {
    columnFilters: ds.IColumnFilter[];
    filters: Array<ds.IFilterGroup | ds.IFilterValue> | ds.IFilterValue | ds.IFilterGroup;
    detailsTemplate: string | ((item: any, h: CreateElement) => string | VNode);
+   sourceArgs: any | null;
    rowClass: (item: any) => string | string[];
    reloadEvent: string;
    idField: string;
@@ -126,6 +127,9 @@ export default Vue.extend({
       filters(this: IThis) {
          this.switchPage(this.page);
       },
+      sourceArgs(this: IThis) {
+         this.switchPage(0, true);
+      },
       pageSize(this: IThis, newValue: number, oldValue: number) {
          const index = oldValue*this.vPage;
          this.switchPage(Math.floor(index/newValue), true);
@@ -179,6 +183,7 @@ export default Vue.extend({
      reloadEvent: { type: String, default: "grid:reload" },
      source: { default: null },
      sourceOptions: { default: null },
+     sourceArgs: { default: null },
      isLoading: { type: Boolean, default: false },
      idField: { type: String, default: () => getSettings().idField },
      sorting: { type: Array, default: () => [] },
@@ -352,7 +357,8 @@ export default Vue.extend({
                   .concat(dataFilters)
                   .concat(externalFilters())
                   .toList(),
-               fields: infos
+               fields: infos,
+               args: this.sourceArgs
             };
             const source = this.vDataSource.load(request);
             new ds.DataPromise(source.resolver)

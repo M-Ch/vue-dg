@@ -62,6 +62,7 @@ export interface IDataRequest {
     sorting: ISortField[];
     filters: IFilterGroup[];
     fields: IFieldInfo[];
+    args: any | null;
  }
  
  export interface IDataPromise {
