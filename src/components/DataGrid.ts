@@ -200,6 +200,7 @@ export default Vue.extend({
      pageUri: { type: String, default: null },
      rowClass: { type: Function },
      filters: {},
+     columnFilters: {},
      detailsTemplate: { default: null },
      fieldInfos: { type: Array, default: null },
      theme: { type: String, default: "dg-light" }
