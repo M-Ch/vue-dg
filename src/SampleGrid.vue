@@ -1,5 +1,6 @@
 <template>
    <div>
+      <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.css"/>
       <div class="dg-grid">
       </div>
       <div id="sample">
@@ -7,7 +8,7 @@
          <data-grid 
             id-field="Id" 
             source="http://localhost/VueDataGrid.Sample/odata/sampleSet" 
-            type="odata"
+            type="odata3"
             :uri.sync="dataUri"
             :pageable="false"
             :reload-event="evName"
@@ -17,39 +18,14 @@
             <data-column field="Price" width="20" type="decimal" :sort-order="0"></data-column>
             <filter-field field="Name" value="a" operator="substr"></filter-field>
          </data-grid>
-         <data-grid 
-            id-field="f1" 
-            details-template="details-tpl"
-            selection-mode="none"
-            :keep-selection="false" 
-            :page.sync="page" 
-            :source="data" 
-            :row-class="rowClass"
-            :page-size="pageSize" 
-            :sorting="['f2', 'f3']" 
-            :sortable="canSort">
+         <data-grid :source="data">
             <data-column field="status" title="Status" :values="statuses"></data-column>
-            <data-column field="status" :template="renderStatus"></data-column>
-            <data-column field="fDate" title="Date" type="dateTime" head-template="head-off" :filter="true" format-options="YYYY-MM-DD!"></data-column>
-            <data-column field="f3" title="bool" type="bool" :filter="true"></data-column>
-            <data-column width="20%" :field="column.field" :name.sync="column.name" v-for="column in columns" :key="column.id" template="field-tpl"></data-column>
-            <data-column title="Commands" template="commands-tpl" width="150px" icon="fa fa-address-book"></data-column>
-            <div slot="head-off" slot-scope="column">
-               <b>header-tpl: {{column.name}}</b>
-            </div>
-            <div slot="field-tpl" slot-scope="{value}">
-               <i>{{value}}</i>
-            </div>
+            <data-column field="created" title="Create date" type="date" :sort-order="1" sort-dir="desc"></data-column>
+            <data-column field="important" title="Important" type="bool" icon="fa fa-exclamation"></data-column>
+            <data-column title="Commands" template="commands-tpl" width="150px"></data-column>
             <div slot="commands-tpl" slot-scope="{row}">
-               <button v-on:click="itemAction(row)">show f3 value</button>
+               <a :href="'details/'+row.id">Details</a>
             </div>
-            <div slot="details-tpl" slot-scope="{item}">
-               <div>F1: {{item.f1}}</div>
-               <div>F2: {{item.f2}}</div>
-            </div>
-            <!--<filter-group>
-               <filter-field v-for="(item, index) in filters" :key="'k'+index" :field="item.field" :value="item.value"></filter-field>
-            </filter-group>-->
          </data-grid>
       </div>
       <button v-on:click="append">switch page</button>
@@ -81,7 +57,7 @@ import "./index";
 import pl from "./i18n/pl-PL";
 import { setLocale } from "./Config";
 
-setLocale(pl);
+//setLocale(pl);
 
 export default Vue.extend({
    name: "SampleGrid",
@@ -112,17 +88,17 @@ export default Vue.extend({
             {key: 4, value: "Error" },
          ],
          data: [
-            {status: 1, fDate: new Date(), f1: "a1", f2: "b1", f3: true },
-            {status: 2, fDate: new Date(), f1: "a2", f2: "b2", f3: false },
-            {status: 4, fDate: new Date(), f1: "a3", f2: "b3", f3: true },
-            {status: 2, fDate: new Date(), f1: "a4", f2: "b4", f3: true },
-            {status: 3, fDate: new Date(), f1: "a5", f2: "b5", f3: false },
-            {status: 3, fDate: new Date(), f1: "a6", f2: "b6", f3: false },
-            {status: 4, fDate: new Date(), f1: "a7", f2: "b7", f3: true },
-            {status: 3, fDate: new Date(), f1: "a8", f2: "b8", f3: true },
-            {status: 2, fDate: new Date(), f1: "a9", f2: "b9", f3: true },
-            {status: 2, fDate: new Date(), f1: "a10", f2: "b10", f3: true },
-            {status: 1, fDate: new Date(), f1: "a11", f2: "b11", f3: true },
+            {id:1 ,status: 1, created: new Date(2018,12,10), f1: "a1", f2: "b1", important: true },
+            {id:2 ,status: 2, created: new Date(2018,4,23), f1: "a2", f2: "b2", important: false },
+            {id:3 ,status: 4, created: new Date(2019,3,20), f1: "a3", f2: "b3", important: true },
+            {id:4 ,status: 2, created: new Date(2019,6,6), f1: "a4", f2: "b4", important: true },
+            {id:5 ,status: 3, created: new Date(2017,2,20), f1: "a5", f2: "b5", important: false },
+            {id:6 ,status: 3, created: new Date(2010,8,26), f1: "a6", f2: "b6", important: false },
+            {id:7 ,status: 4, created: new Date(2011,4,5), f1: "a7", f2: "b7", important: true },
+            {id:8 ,status: 3, created: new Date(2019,1,4), f1: "a8", f2: "b8", important: true },
+            {id:9 ,status: 2, created: new Date(2013,8,12), f1: "a9", f2: "b9", important: true },
+            {id:10 ,status: 2, created: new Date(2011,1,1), f1: "a10", f2: "b10", important: true },
+            {id:11 ,status: 1, created: new Date(2019,10,20), f1: "a11", f2: "b11", important: true },
          ]
       };
    },
