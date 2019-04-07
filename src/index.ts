@@ -36,7 +36,9 @@ const plugin = {
    locales
 };
 
-addRemoteSource("odata", odata.buildUrl, odata.mapData);
+addRemoteSource("odata3", (url, request) => odata.buildUrl(3, url, request), result => odata.mapData(3, result));
+addRemoteSource("odata4", (url, request) => odata.buildUrl(4, url, request), result => odata.mapData(4, result));
+addRemoteSource("odata", (url, request) => odata.buildUrl(4, url, request), result => odata.mapData(4, result));
 addRemoteSource("kendo-mvc", kendo.buildUrl, kendo.mapData);
 
 export default plugin;

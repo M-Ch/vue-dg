@@ -23,10 +23,14 @@ function mapDirection(direction: SortDirection) {
    throw {message: `Unknown odata sort direction: ${direction}` };
 }
 
-export function mapData(result: any): IDataPage {
+export function mapData(version: ODataVersion, result: any): IDataPage {
+   const paramName = version === ODataVersion.Version3
+      ? "odata.count"
+      : "@odata.count";
+
    return {
       items: result.value,
-      total: parseInt(result["odata.count"], 10)
+      total: parseInt(result[paramName], 10)
    };
 }
 
@@ -34,7 +38,12 @@ interface IArgs {
    vars: Array<{name: string, value: string | null }>;
 }
 
-export function buildUrl(url: string, request: IDataRequest): IUrlSet {
+export enum ODataVersion {
+   Version3 = 3,
+   Version4 = 4
+}
+
+export function buildUrl(version: ODataVersion, url: string, request: IDataRequest): IUrlSet {
    const filterGroups = request.filters.map(group => group.filters.map((filter): string | null => {
       const operator = operatorOrDefault(filter.operator);
       const fieldInfo = request.fields.find(i => i.field === filter.field);
@@ -85,9 +94,12 @@ export function buildUrl(url: string, request: IDataRequest): IUrlSet {
 
    const dataUrl = `${url}?${vars}`;
    const joinSymbol = vars ? "&" : "";
+   const countParam = version === ODataVersion.Version3
+      ? "$inlinecount=allpages"
+      : "$count=true";
 
    return {
       dataUrl,
-      pageUrl: `${dataUrl}${joinSymbol}$top=${request.pageSize}&$skip=${request.page*request.pageSize}&$inlinecount=allpages`
+      pageUrl: `${dataUrl}${joinSymbol}$top=${request.pageSize}&$skip=${request.page*request.pageSize}&${countParam}`
    };
 }
