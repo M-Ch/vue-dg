@@ -106,6 +106,7 @@ export interface ISettingsArgs {
    thousandSeparator?: string;
    decimalPrecision?: number;
    decimalSeparator?: string;
+   ignoreDateOffset?: boolean;
 }
 
 export interface ILang {

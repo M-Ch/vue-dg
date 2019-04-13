@@ -120,6 +120,7 @@ export interface ISettings {
    thousandSeparator: string;
    decimalPrecision: number;
    decimalSeparator: string;
+   ignoreDateOffset: boolean;
 }
 
 export interface ISettingsArgs {
@@ -127,13 +128,15 @@ export interface ISettingsArgs {
    thousandSeparator?: string;
    decimalPrecision?: number;
    decimalSeparator?: string;
+   ignoreDateOffset?: boolean;
 }
 
 const settings: ISettings = {
    idField: "id",
    thousandSeparator: " ",
    decimalPrecision: 2,
-   decimalSeparator: "."
+   decimalSeparator: ".",
+   ignoreDateOffset: false
 };
 
 export function setSettings(values: any | ISettingsArgs) {
@@ -206,13 +209,32 @@ addType("bool", {
    filterComponent: "BoolFilter"
 });
 
+function normailzeDate(value: any) {
+   if(value instanceof Date)
+      return value;
+
+   if(typeof value !== "string")
+      return new Date(value);
+
+   const last = value.charAt(value.length-1);
+   if(last === 'z' || last === 'Z')
+      return new Date(value.substr(0, value.length-1));
+   if(value.length < 6)
+      return new Date(value);
+
+   const separator = value.charAt(value.length-6);
+   const raw = separator === '+' || separator === "-"
+      ? value.substr(0, value.length-6)
+      : value;
+
+   return new Date(raw);
+}
+
 addType("date", {
    formatter: (value, options) => {
       if(!value)
          return "";
-      const date = value instanceof Date
-         ? value
-         : new Date(value);
+      const date = normailzeDate(value);
       return formatDate(date, typeof options === "string" ? options : calendarSettings.dateFormat);
    },
    filterComponent: "DateFilter"
@@ -270,9 +292,7 @@ addType("dateTime", {
    formatter: (value, options) => {
       if(!value)
          return "";
-      const date = value instanceof Date
-         ? value
-         : new Date(value);
+      const date = normailzeDate(value);
       return formatDate(date, typeof options === "string" ? options : calendarSettings.dateTimeFormat);
    },
    filterComponent: "DateTimeFilter"
