@@ -142,6 +142,13 @@ If you need to pass additional variables to OData source you can use `sourceArgs
 ```html
 <data-grid source="odata/items" type="odata" :source-args="[{name: 'customVar', value: 'value'}]">...</data-grid>
 ```
+#### Custom data source
+You can create custom data source type by registering it with:
+```js
+DataGrid.addRemoteSource("typeName", urlBuilder, dataMapper);
+```
+`urlBuilder` is a function called with url and request parameters. `dataMapper` is a function used to map server response to a single data page.
+See `mapData` and `buildUrl` function definitions in [OData implementaiton](https://github.com/M-Ch/vue-dg/blob/master/src/OData.ts) for more details.
 #### Data filtering
 There are three sources of data filters in use.
 * User filters. Filters selected by user from filter popups. Use `columnFilters` property to view them.
@@ -204,5 +211,72 @@ methods: {
     }
 }
 ```
+## Configuration
+### Localization
+DataGrid component can be fully localized. You can configure language and calendar settings with:
+```js
+DataGrid.setLocale(DataGrid.locales.plPL);
+```
+You can use English or Polish localization. If you want to create your own localization, check [example localization file](https://github.com/M-Ch/vue-dg/blob/master/src/i18n/pl-PL.ts).
+### Custom data types
+You can define custom data types that can be used to format column value and/ or provide custom filter control.
+```js
+DataGrid.addType("customType", {
+    //every parameter is optional:
+    //you can return VNode:
+    formatter: (value, options, h) => h("b", ["custom html", value]),
+    //or string:
+    //formatter: (value) => "Hello: "+value,
+    filterComponent: "CustomFilter",
+    filterParams: { customParam: true }
+});
+```
+The `formatter` is a function invoked for each cell value in the given column. Arguments passed to the function are: field raw value, options defined in *formatOptions* column property, rendering function. The function should return *VNode* created with rendering function or plain string.
+The `filterComponent` parameter can be used to specify what type of component should be used in column filter popup menus. If this value is not specified or empty data column of this type will not be filterable.
+The `filterParams` is an optional object that will be passed as property to filterComponent instance. This value can be used to parameterize filtering component.
+#### Built in filter components
+|Component|`filterParams` parameter|
+|-|-|
+|BoolFilter||
+|DateFilter||
+|NumericFilter|{decimal: true\|false}|
+|DateTimeFilter||
+|TextFilter||
+|ValueListFilter||
+
+### Config parameters
+You can use the `setSettings` method to configure DataGrid. You can pass an object containing only those settings which should be overridden.
+```js
+DataGrid.setSettings({idField: "id"});
+```
+|Config key|Description|Default value|
+|-|-|-|
+|idField|Identity field name. Required for selecting and displaying row details.|id|
+thousandSeparator|Character used as thousand separator in default numeric formatters.|" " (*single space*)|
+decimalPrecision|Numer of decimal places to displayed by default numeric formatters.|2|
+decimalSeparator|Character used to separate decimal and integer part of numeric value.|.|
+ignoreDateOffset|Ignores utc offset information when parsing dates provided as string values in date and dateTime formatters.|false|
+defaultRemoteSource|What data source type should be used when `type` property is not specified and the source is not an array of objects|*null*|
+### Calendar parameters
+You can use `setCalendar` method to customize the calendar used in data and dateTime filter components. You can pass an object containing only those settings which should be overridden.
+```js
+DataGrid.setCalendar({weekStart: 0});
+```
+|Config key|Description|
+|-|-|
+|dateFormat|Date (without time) format defined with tokens. See section below.|
+|datePlaceholder|Text displayed as a placeholder for date input.|
+|timeFormat|Time (without date) format defined with tokens|
+|timePlaceholder|Text displayed as a placeholder for time input.|
+|dateTimeFormat|Date and time format defined with tokens.|
+|dateTimePlaceholder|Text displayed as a placeholder for date and time input.|
+|dayNames|Array of abbreviated day names starting with Sunday.|
+|monthNamesFull|Array of full month names.|
+|monthNamesShort|Array of abbreviated month names.|
+|weekStart|First day of a week. Use 0 for Sunday, 1 for Monday.|
+|yearFormat|Text representing year in the calendar header. For example, you can use `"{year}年"` value to properly suffix year value in Japanese locale.|
+|monthFormat|Text representing month in the calendar header. For example, you can use `"{month}月"` value to properly suffix month value in Japanese locale.|
+|yearRangeFormat|Text that represents the year range in decade calendar mode. For example, you can use `"{from}年 - {to}年"` value to properly suffix years in Japanese locale.|
+|monthFirst|Boolean value indicating the month and year display order in calendar header.|
 ## License
 MIT License
