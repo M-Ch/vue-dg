@@ -3,6 +3,7 @@ import { IFilterGroup, FilterOperator } from "../DataSource";
 import { chain } from '@/linq';
 import { localize, getCalendar } from "../Config";
 import DatePicker from "./DatePicker";
+import focus from "./FocusInput";
 
 interface IThis extends Vue {
    value: IFilterGroup[];
@@ -17,6 +18,9 @@ export default Vue.extend({
    },
    components: {
       DatePicker
+   },
+   directives: {
+      focus: focus()
    },
    render(this: IThis, h) {
       const filters = this.value && this.value.length ? this.value : [];
@@ -52,6 +56,9 @@ export default Vue.extend({
                   format: calendar.dateTimeFormat,
                   placeholder: calendar.dateTimePlaceholder
                },
+               directives: [
+                  { name: "focus" }
+               ],
                on: {
                   input: (value: Date) => {
                      emitValue(value, toFilter ? toFilter.filters[0].value as Date : null);

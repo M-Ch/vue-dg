@@ -79,15 +79,37 @@ export default Vue.extend({
             selectionEnd: this.editIndex
          },
          on: {
+            dgFocus: (e: Event) => {
+               e.preventDefault();
+               const input = e.target as HTMLInputElement;
+               input.focus();
+               this.popupVisible = false;
+            },
             keydown: (e: KeyboardEvent) => {
+               const input = e.target as HTMLInputElement;
                if(e.key === "Tab")
                   return true;
                if(e.key === "c" && e.ctrlKey)
                   return true;
                if(e.key === "a" && e.ctrlKey)
                   return true;
+               if((e.key === "v" || e.key === "x") && e.ctrlKey) {
+                  this.$nextTick(() => {
+                     const index = this.editIndex;
+                     this.editValue = dt.tryParse(input.value, this.format) ? input.value : "";
+                     this.editIndex = Math.min(index > 0 ? index : this.editValue.length, this.editValue.length);
+                  });
+                  return true;
+               }
+               if(!this.popupVisible && e.key === "Escape") {
+                  this.editValue = "";
+                  input.blur();
+                  return;
+               }
                if(e.key === "Enter" || e.key === "Escape") {
                   this.popupVisible = false;
+                  const result = dt.tryParse(this.editValue, this.format);
+                  this.$emit("input", result);
                   return;
                }
                if(/^F\d+$/gm.test(e.key))
@@ -108,7 +130,7 @@ export default Vue.extend({
                      if(e.key === "ArrowLeft")
                         return Math.max(0, index-1);
                      if(e.key === "ArrowRight")
-                        return Math.min(index+1, target.length-1);
+                        return Math.min(index+1, target.length);
                      if(e.key === "Home")
                         return 0;
                      if(e.key === "End")
@@ -116,7 +138,7 @@ export default Vue.extend({
                      return null;
                   })();
                   if(specialIndex !== null) {
-                     this.editIndex = specialIndex;
+                     this.editIndex = Math.min(specialIndex, this.editValue ? this.editValue.length : 0);
                      return;
                   }
 
@@ -141,8 +163,10 @@ export default Vue.extend({
                   }
 
                   if(e.key === "Delete") {
-                     if(index > 0)
+                     if(index >= 0) {
                         this.editValue = replacePart(target, index, this.placeholder[index]);
+                        this.editIndex++;
+                     }
                      return;
                   }
 
@@ -241,7 +265,10 @@ export default Vue.extend({
                            this.popupValue = value;
                            this.$emit("input", this.popupValue);
                            this.editValue = dt.formatDate(this.popupValue, this.format);
+                           const input = this.$el.querySelector("input[type='text']") as HTMLInputElement;
+                           input.focus();
                            this.popupVisible = false;
+                           this.editIndex = this.editValue.length;
                         }
                      }
                   });
