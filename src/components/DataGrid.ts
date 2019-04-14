@@ -77,6 +77,10 @@ interface IThis extends Vue, IMethods, IData {
    fieldInfos: ds.IFieldInfo[];
 }
 
+function buildSourceOrDefault(source: any, sourceType: any) {
+   return buildSource(source, sourceType ? sourceType : getSettings().defaultRemoteSource);
+}
+
 export default Vue.extend({
    name: "DataGrid",
    data() {
@@ -84,7 +88,7 @@ export default Vue.extend({
       return cast<IData>({
          vPage: 0,
          vFetchId: 0,
-         vDataSource: buildSource(self.source, self.type),
+         vDataSource: buildSourceOrDefault(self.source, self.type),
          vPageData: [],
          vSorting: self.sorting ? n.normalizeSorting(self.sorting) : [],
          vTotal: 0,
@@ -135,10 +139,10 @@ export default Vue.extend({
          this.switchPage(Math.floor(index/newValue), true);
       },
       source(this: IThis) {
-         this.vDataSource = buildSource(this.source, this.type);
+         this.vDataSource = buildSourceOrDefault(this.source, this.type);
       },
       soureOptions(this: IThis) {
-         this.vDataSource = buildSource(this.source, this.type);
+         this.vDataSource = buildSourceOrDefault(this.source, this.type);
       },
       selectionMode(this: IThis) {
          if(this.selectionMode === SelectionMode.None) {

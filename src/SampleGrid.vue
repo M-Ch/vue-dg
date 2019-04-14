@@ -8,7 +8,6 @@
          <data-grid 
             id-field="Id" 
             source="http://localhost/VueDataGrid.Sample/odata/sampleSet" 
-            type="odata3"
             :uri.sync="dataUri"
             :pageable="false"
             :reload-event="evName"
@@ -55,7 +54,8 @@ import TimeDisplay from './components/TimeDisplay'
 import ScrollPanel from './components/ScrollPanel'
 import "./index";
 import pl from "./i18n/pl-PL";
-import { setLocale } from "./Config";
+import { setLocale, setSettings } from "./Config";
+setSettings({ defaultRemoteSource: "odata3" });
 
 //setLocale(pl);
 

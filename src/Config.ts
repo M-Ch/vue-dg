@@ -121,6 +121,7 @@ export interface ISettings {
    decimalPrecision: number;
    decimalSeparator: string;
    ignoreDateOffset: boolean;
+   defaultRemoteSource: string | null;
 }
 
 export interface ISettingsArgs {
@@ -129,6 +130,7 @@ export interface ISettingsArgs {
    decimalPrecision?: number;
    decimalSeparator?: string;
    ignoreDateOffset?: boolean;
+   defaultRemoteSource?: string;
 }
 
 const settings: ISettings = {
@@ -136,7 +138,8 @@ const settings: ISettings = {
    thousandSeparator: " ",
    decimalPrecision: 2,
    decimalSeparator: ".",
-   ignoreDateOffset: false
+   ignoreDateOffset: false,
+   defaultRemoteSource: null
 };
 
 export function setSettings(values: any | ISettingsArgs) {

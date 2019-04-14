@@ -107,6 +107,7 @@ export interface ISettingsArgs {
    decimalPrecision?: number;
    decimalSeparator?: string;
    ignoreDateOffset?: boolean;
+   defaultRemoteSource?: string;
 }
 
 export interface ILang {

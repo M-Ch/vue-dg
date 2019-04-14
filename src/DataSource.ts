@@ -172,6 +172,8 @@ export default function(source: any, sourceType: any) {
       return emptySource();
 
    if(typeof source === "string") {
+      if(!sourceType)
+         throw { error: "DataGrid source type is not defined. Use 'type' property or set defaultRemoteSource through configuration." };
       const builder = sources[sourceType];
       if(builder)
          return builder(source);
