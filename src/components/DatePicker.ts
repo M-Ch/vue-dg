@@ -104,6 +104,7 @@ export default Vue.extend({
                if(!this.popupVisible && e.key === "Escape") {
                   this.editValue = "";
                   input.blur();
+                  e.stopPropagation();
                   return;
                }
                if(e.key === "Enter" || e.key === "Escape") {

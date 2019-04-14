@@ -17,7 +17,10 @@ interface IThis extends Vue {
    fieldName: string;
    workingValue: IFilterGroup[];
    clickListener: () => void;
+   keyListener: (e: KeyboardEvent) => void;
    closeListener: (e: Event) => void;
+   bindEvents: () => void;
+   unbindEvents: () => void;
 }
 
 export default Vue.extend({
@@ -39,12 +42,22 @@ export default Vue.extend({
          this.opened = false;
          e.stopPropagation();
       };
-      document.addEventListener("click", this.clickListener);
-      document.addEventListener("dg-filter-popup-close", this.closeListener);
+      this.keyListener = (e: KeyboardEvent) => {
+         if(e.key === "Enter") {
+            this.opened = false;
+            this.$emit("input", this.workingValue);
+            e.stopPropagation();
+         }
+         if(e.key === "Escape") {
+            this.opened = false;
+            e.stopPropagation();
+         }
+      };
+      if(this.opened)
+         this.bindEvents();
    },
    beforeDestroy(this: IThis) {
-      document.removeEventListener("click", this.clickListener);
-      document.removeEventListener("dg-filter-popup-close", this.closeListener);
+      this.unbindEvents();
    },
    data() {
       return {
@@ -52,8 +65,24 @@ export default Vue.extend({
          workingValue: [],
       };
    },
+   methods: {
+      bindEvents(this: IThis) {
+         document.addEventListener("click", this.clickListener);
+         document.addEventListener("keydown", this.keyListener);
+         document.addEventListener("dg-filter-popup-close", this.closeListener);
+      },
+      unbindEvents(this: IThis) {
+         document.removeEventListener("click", this.clickListener);
+         document.removeEventListener("keydown", this.keyListener);
+         document.removeEventListener("dg-filter-popup-close", this.closeListener);
+      }
+   },
    watch: {
       opened(this: IThis) {
+         if(this.opened)
+            this.bindEvents();
+         else
+            this.unbindEvents();
          if(!this.opened)
             return;
          const ev = new CustomEvent("dg-filter-popup-close", { detail: { sender: this } });
