@@ -79,7 +79,9 @@ export function buildUrl(version: ODataVersion, url: string, request: IDataReque
       if(operator === FilterOperator.NotEqals)
          return `not(${filter.field} eq ${formatValue(fieldInfo, filter.value)})`;
       if(operator === FilterOperator.Contains)
-         return `substringof(${formatValue(fieldInfo, filter.value)}, ${filter.field})`;
+         return version === ODataVersion.Version3
+            ?  `substringof(${formatValue(fieldInfo, filter.value)}, ${filter.field})`
+            :  `contains(${filter.field}, ${formatValue(fieldInfo, filter.value)})`;
       if(operator === FilterOperator.In) {
          if(!filter.value || filter.value.length === 0)
             return null;
