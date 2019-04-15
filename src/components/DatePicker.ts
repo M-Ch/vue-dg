@@ -111,6 +111,7 @@ export default Vue.extend({
                   this.popupVisible = false;
                   const result = dt.tryParse(this.editValue, this.format);
                   this.$emit("input", result);
+                  e.stopPropagation();
                   return;
                }
                if(/^F\d+$/gm.test(e.key))
