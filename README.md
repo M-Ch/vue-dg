@@ -11,7 +11,11 @@ import DataGrid from "vue-dg";
 DataGrid.setLocale(DataGrid.locales.plPL);
 Vue.use(DataGrid);
 ```
-3. Import css from: `dist\DataGrid.css`
+
+3. Import css with:
+```js
+ import 'vue-dg/dist/DataGrid.css';
+ ```
 
 ## Features
 * Can bind to local data (array) or remote data (WebApi or Kendo DataSourceRequest)
