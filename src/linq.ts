@@ -35,6 +35,22 @@ class Enumerable<T> {
       });
    }
 
+   public orderBy(selector: (item: T) => any) {
+      return new Enumerable<T>(() => {
+         const items = this.items();
+         items.sort((a,b) => {
+            const keyA = selector(a);
+            const keyB = selector(b);
+            if(keyA < keyB)
+               return -1;
+            if(keyA > keyB)
+               return 1;
+            return 0;
+         });
+         return items;
+      });
+   }
+
    public selectMany<TResult>(selector: (item: T) => TResult[]) {
       return new Enumerable<TResult>(() => {
          const result: TResult[] = [];
@@ -49,6 +65,35 @@ class Enumerable<T> {
       return new Enumerable<T>(() => {
          const result = this.items();
          result.push(...other);
+         return result;
+      });
+   }
+
+   public groupSorted(keysSelector: (item: T) => any[])  {
+
+      const arraysEqual = (first: any[], second: any[]) => {
+         if(first.length !== second.length)
+            return false;
+         for(let i=0;i<first.length;i++)
+            if(first[i] !== second[i])
+               return false;
+         return true;
+      };
+
+      return new Enumerable<ISortedGroup<T>>(() => {
+         const values = this.items();
+         let groupKey: any[] = [];
+         const result: Array<ISortedGroup<T>> = [];
+
+         for(let a=0;a<values.length;a++) {
+            const item = values[a];
+            const currentKey = keysSelector(item);
+            if(a === 0 || !arraysEqual(groupKey, currentKey))  {
+               groupKey = currentKey;
+               result.push({ key: groupKey, values: []});
+            }
+            result[result.length-1].values.push(item);
+         }
          return result;
       });
    }
@@ -121,6 +166,11 @@ class Enumerable<T> {
    public cast<TResult>() {
       return this as any as Enumerable<TResult>;
    }
+}
+
+export interface ISortedGroup<TValue> {
+   key: any[];
+   values: TValue[];
 }
 
 export interface IGroup<TValue> {

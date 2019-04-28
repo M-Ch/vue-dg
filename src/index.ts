@@ -3,6 +3,7 @@ import DataGrid from "./components/DataGrid";
 import DataColumn from "./components/DataColumn";
 import FilterGroup from "./components/FilterGroup";
 import FilterField from "./components/FilterField";
+import GroupField from "./components/GroupField";
 import { addType, setLanguage, setFilterComponent, setCalendar, setSettings, setLocale } from "./Config";
 import { addSource, addRemoteSource, addXhrHook } from "./DataSource";
 import * as odata from "./OData";
@@ -17,7 +18,8 @@ const components: {[key: string]: VueConstructor} = {
    DataGrid,
    DataColumn,
    FilterGroup,
-   FilterField
+   FilterField,
+   GroupField
 };
 
 const plugin = {

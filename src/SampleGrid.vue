@@ -16,20 +16,28 @@
             <data-column field="Release" width="80%" :filter="true" type="date" :sort-order="1"></data-column>
             <data-column field="Price" width="20" type="decimal" :sort-order="0"></data-column>
             <filter-field field="Name" value="a" operator="substr"></filter-field>
+            <group-field :field="flag ? 'Name' : 'Release'" direction="desc"></group-field>
          </data-grid>
-         <data-grid :source="data">
+         <data-grid :source="data" group-template="group-tpl">
             <data-column field="status" title="Status" :values="statuses"></data-column>
             <data-column field="created" title="Create date" type="date" :sort-order="1" sort-dir="desc"></data-column>
             <data-column field="important" title="Important" type="bool" icon="fa fa-exclamation"></data-column>
             <data-column title="Commands" template="commands-tpl" width="150px"></data-column>
+            <group-field field="status" :order="flag ? 0 : 1"></group-field>
+            <group-field field="important" :order="flag ? 1 : 0"></group-field>
             <div slot="commands-tpl" slot-scope="{row}">
                <a :href="'details/'+row.id">Details</a>
+            </div>
+            <div slot="group-tpl" slot-scope="{group}">
+               <span>Status: {{group.status}}</span>
+               <b v-if="group.important">, important</b>
             </div>
          </data-grid>
       </div>
       <button v-on:click="append">switch page</button>
       <button v-on:click="reload">reload</button>
       <button v-on:click="filters = []">change test: {{withFilter}}</button>
+      <button v-on:click="flag = !flag">switchFlag: {{flag}}</button>
       <div>{{dataUri}}</div>
       <div>{{dataPage}}</div>
       <input type="text" v-model="evName"/>
@@ -69,6 +77,7 @@ export default Vue.extend({
          dataPage: null,
          canSort: true,
          withFilter: true,
+         flag: true,
          selected: [],
          filters: [
             { field: "f1", value: "a9" },

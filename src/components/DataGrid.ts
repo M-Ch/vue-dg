@@ -3,7 +3,7 @@ import { cast } from "./Grid";
 import { IDataColumn, DataColumn, IKeyValuePair } from "./DataColumn";
 import { getFormatter, getFilterComponent, getSettings } from "../Config";
 import buildSource, * as ds from "../DataSource";
-import { chain, range } from '@/linq';
+import { chain } from '@/linq';
 import "./DataGrid.less";
 import Pager from "./Pager";
 import PageList from "./PageList";
@@ -13,6 +13,7 @@ import * as n from "../Normalization";
 import { IListener } from "./Interfaces";
 import { IDataGroup, FilterGroup } from "./FilterGroup";
 import { IDataFilter, FilterField } from "./FilterField";
+import { GroupField, IGroupField } from "./GroupField";
 
 function logError(message: string) {
    if(!Vue.config.silent)
@@ -27,6 +28,7 @@ interface IMethods extends IListener {
    fetchSource: () => void;
    findColumns: () => IDataColumn[];
    bindReload: (eventName: string | null) => void;
+   findGrouping: () => ds.ISortField[];
 }
 
 interface IData {
@@ -75,6 +77,7 @@ interface IThis extends Vue, IMethods, IData {
    checkboxes: boolean;
    keepSelection: boolean;
    fieldInfos: ds.IFieldInfo[];
+   groupTemplate: string | ((item: any, h: CreateElement) => string | VNode);
 }
 
 function buildSourceOrDefault(source: any, sourceType: any) {
@@ -207,7 +210,8 @@ export default Vue.extend({
      columnFilters: {},
      detailsTemplate: { default: null },
      fieldInfos: { type: Array, default: null },
-     theme: { type: String, default: "dg-light" }
+     theme: { type: String, default: "dg-light" },
+     groupTemplate: { default: null }
    },
    methods: cast<IMethods>({
       switchPage(this: IThis, page, forceReload, initialLoad?) {
@@ -263,6 +267,19 @@ export default Vue.extend({
             .select(i => i.componentOptions && i.componentOptions.propsData ? i.componentOptions.propsData : null)
             .where(i => i !== null)
             .cast<IDataColumn>()
+            .toList();
+      },
+      findGrouping(this: IThis) {
+         const nodes = this.$slots.default;
+         if(nodes === undefined)
+            return [];
+         return chain(nodes)
+            .where(i => i.tag !== undefined && i.tag.endsWith(GroupField))
+            .select(i => i.componentOptions && i.componentOptions.propsData ? i.componentOptions.propsData : null)
+            .where(i => i !== null)
+            .cast<IGroupField>()
+            .orderBy(i => i.order)
+            .select<ds.ISortField>(i => ({ field: i.field, direction: i.direction ? i.direction : ds.SortDirection.Asc }))
             .toList();
       },
       updateSelection(this: IThis, item: any) {
@@ -353,7 +370,21 @@ export default Vue.extend({
                }));
 
             const request: ds.IDataRequest = {
-               sorting: this.vSorting,
+               sorting: (() => {
+                  const grouping = this.findGrouping();
+                  const groupLookup: {[key: string]: boolean} = {};
+                  grouping.forEach(i => groupLookup[i.field] = true);
+                  const sortLookup: {[key: string]: ds.ISortField} = {};
+                  this.vSorting.forEach(i => sortLookup[i.field] = i);
+
+                  const groupingPart = grouping.map(i => {
+                     const existing = sortLookup[i.field];
+                     return existing ? existing : i;
+                  });
+                  const sortingPart = this.vSorting.filter(i => !groupLookup[i.field]);
+
+                  return [...groupingPart, ...sortingPart]
+               })(),
                page: this.vPage,
                pageSize: this.pageSize,
                filters: chain(this.vColumnFilters)
@@ -604,7 +635,7 @@ export default Vue.extend({
                })
             ]));
 
-         const classes = selected[data[this.idField]] ? ["dg-selected"] : [];
+         const classes = ["dg-data-row", selected[data[this.idField]] ? "dg-selected" : null];
          if(this.rowClass) {
             const additional = this.rowClass(data);
             if(Array.isArray(additional))
@@ -652,11 +683,44 @@ export default Vue.extend({
          return rows;
       };
 
+      const renderGroupRow = (keyValues: any[], grouping: string[]) => {
+         const dataItem: any = {};
+         for(let a=0;a<grouping.length;a++)
+            dataItem[grouping[a]] = keyValues[a];
+
+         const buildContent = () => {
+            if(!this.groupTemplate)
+               return keyValues.join(", ");
+            if(typeof this.groupTemplate === "string") {
+               const tpl = this.$scopedSlots[this.groupTemplate];
+               if(!tpl) {
+                  logError(`Unable to find scoped slot named '${this.groupTemplate}' defined as template for grid data group.`);
+                  return keyValues.join(", ");
+               }
+               return tpl({ group: dataItem });
+            }
+            return this.groupTemplate(dataItem, h);
+         };
+
+         return h("tr", {
+            class: "dg-grouping-row"
+         }, [ h("td", { attrs: { colspan: columns.length } }, [buildContent()]) ]);
+      };
+
       const cols = columns.map(i => h("col", { style: { width: i.definition.width ? i.definition.width : undefined } }));
       if(hasDetails)
          cols.unshift(h("col", { style: { width: "5px" } }));
       const thead = h("thead", {class: "dg-head"}, [h("tr", {}, headerCells)]);
-      const dataRows = chain(this.vPageData).selectMany(renderRow).toList();
+      const dataRows = (() => {
+         const grouping = this.findGrouping();
+         const pageData = chain(this.vPageData);
+         return grouping.length === 0
+            ? pageData.selectMany(renderRow).toList()
+            : pageData
+               .groupSorted(item => grouping.map(i => item[i.field]))
+               .selectMany(i => [renderGroupRow(i.key, grouping.map(j => j.field)), ...i.values.map(renderRow).flat() ])
+               .toList();
+      })();
       const tbody = h("tbody", { class: "dg-body" }, dataRows);
       const dataTable = h("table", { class: "dg-table" }, [h("colgroup", {}, cols), thead, tbody]);
 
