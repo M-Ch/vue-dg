@@ -25,6 +25,7 @@ Vue.use(DataGrid);
 * Localization support (language and data formatting settings)
 * Custom column templates with slots, functions and rendering functions
 * Row details
+* Data grouping
 
 ## Example
 ![Example grid](https://user-images.githubusercontent.com/11445153/55687695-3ca27600-5970-11e9-8a91-7ad65104d8d6.png)
@@ -105,6 +106,7 @@ idField|string|Identity field name. Required for selecting and displaying row de
 sorting|array|Currently applied sorting. Can be sync.|
 selectedIds|array|Currently selected rows ids. Can be sync.|
 selected|array|Currently selected row items. Emit only.|
+groupTemplate|string or function|Defines grouping template. See section about data grouping.|
 selectionMode|none, single, multi|Default: *none*.|
 checkboxes|bool|Should checkboxes be displayed in *multi* selection mode. Default: *true*.|
 keepSelection|bool|Should selected row ids be remembered when grid page is changed. Default: *false*.|
@@ -153,6 +155,29 @@ DataGrid.addRemoteSource("typeName", urlBuilder, dataMapper);
 ```
 `urlBuilder` is a function called with url and request parameters. `dataMapper` is a function used to map server response to a single data page.
 See `mapData` and `buildUrl` function definitions in [OData implementaiton](https://github.com/M-Ch/vue-dg/blob/master/src/OData.ts) for more details.
+#### Data grouping
+You can group data rows using `GroupField` component. All properties of `GroupField` component are reactive so you can bind them or use *v-if* for conditional grouping.
+```html
+<data-grid group-template="group-tpl">
+    <group-field field="category" :order="0" direction="desc"></group-field>
+    <group-field field="subCategory"></group-field>
+    <div slot="group-tpl" slot-scope="{group}">
+        <span>Category: {{group.category}}</span>
+        <span>Sub category: {{group.subCategory}}</span>
+    </div>
+</data-grid>
+```
+##### `GroupField` properties
+|Property|Type|Info|
+|--------|----|----|
+|field|string|Grouped field name|
+|order|number|When multiple group fields are specified, use this property to specify the grouping order|
+|direction|string|*asc* or *desc*. Default: *asc*|
+#### Grouping header
+You can use the `groupTemplate` property of the `DataGrid` component to specify the template of data group header row. You can bind a named slot name or a function which should return a *VNode* or named slot name. If you bind a function, it will be called with the following arguments: object with grouped key values, `CreateElement` function.
+```ts
+groupTemplate: string | ((item: any, h: CreateElement) => string | VNode)
+```
 #### Data filtering
 There are three sources of data filters in use.
 * User filters. Filters selected by user from filter popups. Use `columnFilters` property to view them.
