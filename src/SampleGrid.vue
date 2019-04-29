@@ -10,6 +10,7 @@
             source="http://localhost/VueDataGrid.Sample/odata/sampleSet" 
             :uri.sync="dataUri"
             :pageable="false"
+            selection-mode="multi"
             :reload-event="evName"
             :page-uri.sync="dataPage">
             <data-column field="Name" type="text"></data-column>

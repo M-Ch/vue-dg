@@ -704,7 +704,7 @@ export default Vue.extend({
 
          return h("tr", {
             class: "dg-grouping-row"
-         }, [ h("td", { attrs: { colspan: columns.length } }, [buildContent()]) ]);
+         }, [ h("td", { attrs: { colspan: columns.length+(hasCheckboxes ? 1 : 0) } }, [buildContent()]) ]);
       };
 
       const cols = columns.map(i => h("col", { style: { width: i.definition.width ? i.definition.width : undefined } }));
