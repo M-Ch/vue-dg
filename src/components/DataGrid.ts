@@ -383,10 +383,10 @@ export default Vue.extend({
                   });
                   const sortingPart = this.vSorting.filter(i => !groupLookup[i.field]);
 
-                  return [...groupingPart, ...sortingPart]
+                  return [...groupingPart, ...sortingPart];
                })(),
-               page: this.vPage,
-               pageSize: this.pageSize,
+               page: this.pageable ? this.vPage : null,
+               pageSize: this.pageable ? this.pageSize : null,
                filters: chain(this.vColumnFilters)
                   .selectMany(i => i.groups)
                   .concat(dataGroups)

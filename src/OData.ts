@@ -95,7 +95,9 @@ export function buildUrl(version: ODataVersion, url: string, request: IDataReque
       ? filterGroups.map(i => `(${i})`).join(" and ")
       : filterGroups.length > 0 ? filterGroups[0] : null;
 
-   const sort = request.sorting.map(i => `${i.field} ${mapDirection(i.direction)}`).join(", ");
+   const sort = request.sorting.length > 0
+      ? request.sorting.map(i => `${i.field} ${mapDirection(i.direction)}`).join(", ")
+      : null;
 
    const customVars = (() => {
       if(!request.args)
@@ -109,16 +111,22 @@ export function buildUrl(version: ODataVersion, url: string, request: IDataReque
       {name: "$filter", value: filters },
       {name: "$orderby", value: sort },
       ...customVars
-   ].filter(i => i.value).map(i => `${i.name}=${i.value}`).join("&");
+   ].filter(i => i.value !== null).map(i => `${i.name}=${i.value}`).join("&");
 
    const dataUrl = `${url}?${vars}`;
    const joinSymbol = vars ? "&" : "";
    const countParam = version === ODataVersion.Version3
-      ? "$inlinecount=allpages"
-      : "$count=true";
+      ? {name: "$inlinecount", value: "allpages" }
+      : {name: "$count", value: "true" };
+
+   const pageVars = [
+      {name: "$top", value: request.pageSize },
+      {name: "$skip", value: request.pageSize !== null && request.page !== null ? request.page * request.pageSize : null },
+      countParam
+   ].filter(i => i.value !== null).map(i => `${i.name}=${i.value}`).join("&");
 
    return {
       dataUrl,
-      pageUrl: `${dataUrl}${joinSymbol}$top=${request.pageSize}&$skip=${request.page*request.pageSize}&${countParam}`
+      pageUrl: `${dataUrl}${joinSymbol}${pageVars}`
    };
 }

@@ -45,8 +45,8 @@ export interface IFieldInfo {
 }
 
 export interface IDataRequest {
-   page: number;
-   pageSize: number;
+   page: number | null;
+   pageSize: number | null;
    sorting: ISortField[];
    filters: IFilterGroup[];
    fields: IFieldInfo[];
@@ -247,7 +247,9 @@ function arraySource(values: any[]): IDataSource {
                   return 0;
                });
 
-            const result = copy.slice(data.page*data.pageSize, (data.page+1)*data.pageSize);
+            const result = data.page !== null && data.pageSize !== null
+               ? copy.slice(data.page*data.pageSize, (data.page+1)*data.pageSize)
+               : copy;
             onSuccess(result, copy.length, "local", "local");
             onAlways();
          } };

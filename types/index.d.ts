@@ -49,19 +49,11 @@ export interface IFieldInfo {
 }
 
 export interface IDataRequest {
-   page: number;
-   pageSize: number;
+   page: number | null;
+   pageSize: number | null;
    sorting: ISortField[];
    filters: IFilterGroup[];
    fields: IFieldInfo[];
-}
-
-export interface IDataRequest {
-    page: number;
-    pageSize: number;
-    sorting: ISortField[];
-    filters: IFilterGroup[];
-    fields: IFieldInfo[];
     args: any | null;
  }
  

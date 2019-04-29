@@ -96,7 +96,7 @@ Slots can be selected dynamically if you bind a function returning slot name to 
 |Property|Type|Info|
 |--------|----|----|
 |page|int|Current page number. Can be sync. Starts from zero.|
-|pageSize|int|Number of rows on one page. Default: *10*.|
+|pageSize|int|Number of rows on one page. Default: *10*. Ignored when *pageable* property is set to *false*.|
 |reloadEvent|string|Event name for triggering data reload. See section below. Default: *grid-reload*.|
 |source|string or array|Data bound to the grid. See section below.|
 |type|string|Type of source bound to the grid. See section below.|

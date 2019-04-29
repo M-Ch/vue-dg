@@ -67,10 +67,11 @@ export function buildUrl(url: string, request: IDataRequest): IUrlSet {
 
    const dataUrl = `${url}?${vars}`;
    const joinSymbol = vars ? "&" : "";
-   const page = request.page+1;
+   const page = (request.page !== null ? request.page : 0)+1;
+   const pageSize = request.pageSize !== null ? request.pageSize : 1000;
 
    return {
       dataUrl,
-      pageUrl: `${dataUrl}${joinSymbol}pageSize=${request.pageSize}&page=${page}`
+      pageUrl: `${dataUrl}${joinSymbol}pageSize=${pageSize}&page=${page}`
    };
 }
