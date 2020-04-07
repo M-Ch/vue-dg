@@ -1,7 +1,7 @@
 import { CreateElement, VueConstructor, VNode } from 'vue';
 
 export interface ITypeDefinition {
-   formatter?: (value: any, options: any, h: CreateElement) => string | VNode;
+   formatter?: (value: any, options: any, h: CreateElement, row: any) => string | VNode;
    filterComponent?: string;
    filterParams?: any;
 }

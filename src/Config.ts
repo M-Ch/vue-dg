@@ -5,7 +5,7 @@ import { INumericFilterParams } from "./components/NumericFilter";
 
 interface ITypeConfig {
    name: string;
-   formatter?: (value: any, options: any, h: CreateElement) => string | VNode;
+   formatter?: (value: any, options: any, h: CreateElement, row: any) => string | VNode;
    filterComponent?: string;
    filterParams: any;
 }
@@ -159,7 +159,7 @@ export function setLanguage(lang: ILang) {
 }
 
 export interface ITypeDefinition {
-   formatter?: (value: any, options: any, h: CreateElement) => string | VNode;
+   formatter?: ((value: any, options: any, h: CreateElement, row: any) => string | VNode);
    filterComponent?: string;
    filterParams?: any;
 }
@@ -173,7 +173,7 @@ export function addType(name: string, definition: ITypeDefinition) {
    };
 }
 
-export function getFormatter(typeName: string | undefined | null): (value: any, options: any, h: CreateElement) => string | VNode {
+export function getFormatter(typeName: string | undefined | null): (value: any, options: any, h: CreateElement, row: any) => string | VNode {
    function defaultFormatter(value: any) {
       return value !== undefined && value !== null ? ""+value : "";
    }

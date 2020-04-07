@@ -253,7 +253,7 @@ You can define custom data types that can be used to format column value and/ or
 DataGrid.addType("customType", {
     //every parameter is optional:
     //you can return VNode:
-    formatter: (value, options, h) => h("b", ["custom html", value]),
+    formatter: (value, options, h, rowData) => h("b", ["custom html", value]),
     //or string:
     //formatter: (value) => "Hello: "+value,
     filterComponent: "CustomFilter",

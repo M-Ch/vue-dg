@@ -583,7 +583,7 @@ export default Vue.extend({
                   const match = binding.values[""+rawValue];
                   return match !== undefined ? match : ""+rawValue;
                }
-               return getFormatter(column.type)(rawValue, column.formatOptions !== undefined ? column.formatOptions : null, h);
+               return getFormatter(column.type)(rawValue, column.formatOptions !== undefined ? column.formatOptions : null, h, data);
             }
 
             const buildFromScope = (scopeName: string) => {
