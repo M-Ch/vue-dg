@@ -735,7 +735,6 @@ export default Vue.extend({
          return this.$slots[this.noDataTemplate];
       })();
       const hasData = dataRows.length > 0;
-      const body = hasData ? dataTable : (noDataPlaceholder ? noDataPlaceholder : dataTable);
 
       const slot = h("div", { class: "dg-hidden" }, this.$slots.default ? this.$slots.default : []);
       const pager = h("pager", {
@@ -779,7 +778,8 @@ export default Vue.extend({
          class: ["dg-grid", this.theme, this.vIsLoading ? "dg-loading" : null, hasData ? "dg-has-data" : "dg-no-data"]
       }, [
          slot,
-         body,
+         dataTable,
+         !hasData ? noDataPlaceholder : null,
          this.pageable ? h("div", { class: "dg-footer"}, [this.canReload ? reloadLink : null, pageList, pager]) : null,
          this.vIsLoading ? h("div", { class: "dg-loader"}) : null,
       ]);
