@@ -19,7 +19,7 @@
             <filter-field field="Name" value="a" operator="substr"></filter-field>
             <group-field :field="flag ? 'Name' : 'Release'" direction="desc"></group-field>
          </data-grid>
-         <data-grid :source="data" group-template="group-tpl" :pageable="false">
+         <data-grid :source="data" group-template="group-tpl" :pageable="false" no-data-template="no-data">
             <data-column field="status" title="Status" :values="statuses"></data-column>
             <data-column field="created" title="Create date" type="date" :sort-order="1" sort-dir="desc"></data-column>
             <data-column field="important" title="Important" type="bool" icon="fa fa-exclamation"></data-column>
@@ -33,10 +33,12 @@
                <span>Status: {{group.status}}</span>
                <b v-if="group.important">, important</b>
             </div>
+            <div slot="no-data">No data :(</div>
          </data-grid>
       </div>
       <button v-on:click="append">switch page</button>
       <button v-on:click="reload">reload</button>
+      <button v-on:click="data = []">clear</button>
       <button v-on:click="filters = []">change test: {{withFilter}}</button>
       <button v-on:click="flag = !flag">switchFlag: {{flag}}</button>
       <div>{{dataUri}}</div>

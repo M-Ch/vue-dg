@@ -67,6 +67,7 @@ interface IThis extends Vue, IMethods, IData {
    columnFilters: ds.IColumnFilter[];
    filters: Array<ds.IFilterGroup | ds.IFilterValue> | ds.IFilterValue | ds.IFilterGroup;
    detailsTemplate: string | ((item: any, h: CreateElement) => string | VNode);
+   noDataTemplate: string | ((h: CreateElement) => string | VNode);
    sourceArgs: any | null;
    rowClass: (item: any) => string | string[];
    reloadEvent: string;
@@ -209,6 +210,7 @@ export default Vue.extend({
      filters: {},
      columnFilters: {},
      detailsTemplate: { default: null },
+     noDataTemplate: { default: null },
      fieldInfos: { type: Array, default: null },
      theme: { type: String, default: "dg-light" },
      groupTemplate: { default: null }
@@ -723,6 +725,17 @@ export default Vue.extend({
       })();
       const tbody = h("tbody", { class: "dg-body" }, dataRows);
       const dataTable = h("table", { class: "dg-table" }, [h("colgroup", {}, cols), thead, tbody]);
+      const noDataPlaceholder = (() => {
+         if(!this.noDataTemplate)
+            return null;
+         if(typeof this.noDataTemplate !== "string") {
+            const result = this.noDataTemplate(h);
+            return typeof result === "string" ? this.$slots[result] : result;
+         }
+         return this.$slots[this.noDataTemplate];
+      })();
+      const hasData = dataRows.length > 0;
+      const body = hasData ? dataTable : (noDataPlaceholder ? noDataPlaceholder : dataTable);
 
       const slot = h("div", { class: "dg-hidden" }, this.$slots.default ? this.$slots.default : []);
       const pager = h("pager", {
@@ -763,10 +776,10 @@ export default Vue.extend({
          }
       }, [h("i", { class: "icon-arrows-cw" })]);
       return h("div", {
-         class: ["dg-grid", this.theme, this.vIsLoading ? "dg-loading" : null]
+         class: ["dg-grid", this.theme, this.vIsLoading ? "dg-loading" : null, hasData ? "dg-has-data" : "dg-no-data"]
       }, [
          slot,
-         dataTable,
+         body,
          this.pageable ? h("div", { class: "dg-footer"}, [this.canReload ? reloadLink : null, pageList, pager]) : null,
          this.vIsLoading ? h("div", { class: "dg-loader"}) : null,
       ]);

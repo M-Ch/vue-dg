@@ -102,6 +102,7 @@ Slots can be selected dynamically if you bind a function returning slot name to 
 |type|string|Type of source bound to the grid. See section below.|
 |sourceArgs|object|Additional arguments for the data source. See section below.|
 isLoading|bool|Indicates if the grid is currently loading data from a server.|
+noDataTemplate|string, function|Slot name used for rendering grid body when no data is present. When a function is specified, it should return a slot name or a `VNode` with template content.|
 idField|string|Identity field name. Required for selecting and displaying row details. Can also be configured globally.|
 sorting|array|Currently applied sorting. Can be sync.|
 selectedIds|array|Currently selected rows ids. Can be sync.|
