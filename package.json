@@ -12,26 +12,26 @@
   "homepage": "https://github.com/M-Ch/vue-dg",
   "main": "dist/DataGrid.umd.js",
   "dependencies": {
-    "vue": "^2.5.17"
+    "vue": "^2.6.12"
   },
   "author": {
-   "name": "Marcin Chwalek"
- },
+    "name": "Marcin Chwalek"
+  },
   "bugs": {
-   "url": "https://github.com/M-Ch/vue-dg/issues"
- },
- "license": "MIT",
- "typings": "types/index.d.ts",
- "repository": {
-   "type": "git",
-   "url": "git+https://github.com/M-Ch/vue-dg.git"
- },
+    "url": "https://github.com/M-Ch/vue-dg/issues"
+  },
+  "license": "MIT",
+  "typings": "types/index.d.ts",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/M-Ch/vue-dg.git"
+  },
   "devDependencies": {
-    "@vue/cli-plugin-typescript": "^3.2.0",
-    "@vue/cli-service": "^3.2.0",
-    "less": "^3.0.4",
+    "@vue/cli-plugin-typescript": "^3.12.1",
+    "@vue/cli-service": "^4.5.9",
+    "less": "^3.13.1",
     "less-loader": "^4.1.0",
-    "typescript": "^3.0.0",
-    "vue-template-compiler": "^2.5.17"
+    "typescript": "^3.9.7",
+    "vue-template-compiler": "^2.6.12"
   }
 }
