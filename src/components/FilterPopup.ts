@@ -16,7 +16,7 @@ interface IThis extends Vue {
    filterParams: any;
    fieldName: string;
    workingValue: IFilterGroup[];
-   clickListener: () => void;
+   mouseDownListener: () => void;
    keyListener: (e: KeyboardEvent) => void;
    closeListener: (e: Event) => void;
    bindEvents: () => void;
@@ -33,7 +33,7 @@ export default Vue.extend({
       filterParams: { },
    },
    mounted(this: IThis) {
-      this.clickListener = () => {
+      this.mouseDownListener = () => {
          this.opened = false;
       };
       this.closeListener = (e: Event) => {
@@ -67,12 +67,12 @@ export default Vue.extend({
    },
    methods: {
       bindEvents(this: IThis) {
-         document.addEventListener("click", this.clickListener);
+         document.addEventListener("mousedown", this.mouseDownListener);
          document.addEventListener("keydown", this.keyListener);
          document.addEventListener("dg-filter-popup-close", this.closeListener);
       },
       unbindEvents(this: IThis) {
-         document.removeEventListener("click", this.clickListener);
+         document.removeEventListener("mousedown", this.mouseDownListener);
          document.removeEventListener("keydown", this.keyListener);
          document.removeEventListener("dg-filter-popup-close", this.closeListener);
       }
@@ -106,7 +106,7 @@ export default Vue.extend({
                   e.stopPropagation();
                   this.workingValue = this.value;
                   this.opened = !this.opened;
-               }
+               },
             }
          }, "▼"),
          this.opened ? h("div", {
@@ -115,13 +115,16 @@ export default Vue.extend({
                click: (e: Event) => {
                   e.stopPropagation();
                   document.dispatchEvent(new Event("dg-date-picker-close"));
+               },
+               mousedown: (e: Event) => {
+                  e.stopPropagation();
                }
             },
             directives: [
                { name: "adjustSide" }
             ]
          }, [
-            h("div", {attrs: { "data-component": this.filterComponent } }, [
+            h("div", { attrs: { "data-component": this.filterComponent }, }, [
                h("form", {
                   on: {
                      submit: (e: Event) => {
