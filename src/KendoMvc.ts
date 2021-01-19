@@ -16,6 +16,10 @@ function findFilter(operator: FilterOperator) {
       return "contains";
    if(operator === FilterOperator.NotEqals)
       return "neq";
+   if(operator === FilterOperator.StartsWith)
+      return "startswith";
+   if(operator === FilterOperator.EndsWith)
+         return "endswith";
    throw {message: `Unknown odata filter type: ${operator}` };
 }
 

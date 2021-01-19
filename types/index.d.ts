@@ -14,7 +14,9 @@ export enum FilterOperator {
     LowerThanOrEqual = "lte",
     NotEqals = "neq",
     In = "in",
-    Contains = "substr"
+    Contains = "substr",
+    StartsWith = "sw",
+    EndsWith = "ew",
  }
 
 export interface IColumnFilter {
