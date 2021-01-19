@@ -211,6 +211,12 @@ function isRowMatching(row: any, filter: IFilterValue) {
       return value === filter.value;
    if(operator === FilterOperator.NotEqals)
       return value !== filter.value;
+   if(operator === FilterOperator.Contains)
+      return value instanceof String && value.indexOf(filter.value) >= 0;
+   if(operator === FilterOperator.StartsWith)
+      return value instanceof String && value.startsWith(filter.value);
+   if(operator === FilterOperator.EndsWith)
+      return value instanceof String && value.endsWith(filter.value);
    if(operator === FilterOperator.GraterThanOrEqual)
       return value >= filter.value;
    if(operator === FilterOperator.GreaterThan)
