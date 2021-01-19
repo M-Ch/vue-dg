@@ -22,14 +22,8 @@ export default Vue.extend({
       const filterValue = filter ? filter[0].value : null;
       const filterOperator = (filter ? filter[0].operator : null) ?? FilterOperator.Contains;
 
-      const emitValue = (value: string, operator: FilterOperator) => {
-         const newValue = value
-            ? [{
-               filters: [{ field:this.fieldName, operator, value }]
-            }]
-            : [];
-         this.$emit("input", newValue);
-      };
+      const emitValue = (value: string, operator: FilterOperator) =>
+         this.$emit("input", [{ filters: [{ field:this.fieldName, operator, value }] }]);
 
       const options: {key: keyof ILang; operator: FilterOperator}[] = [
          { key: "containsValue", operator: FilterOperator.Contains },
