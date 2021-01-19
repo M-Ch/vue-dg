@@ -107,6 +107,7 @@ export default Vue.extend({
                   this.workingValue = this.value;
                   this.opened = !this.opened;
                },
+               mousedown: (e: Event) => e.stopPropagation()
             }
          }, "▼"),
          this.opened ? h("div", {
