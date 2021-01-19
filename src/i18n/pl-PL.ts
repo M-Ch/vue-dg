@@ -46,8 +46,12 @@ const text: ILang = {
    dropdownLabel: "Wybierz...",
    rangeFrom: "Od:",
    rangeTo: "Do:",
-   containsValue: "Zawiera:",
-   valueEquals: "Równa się:"
+   containsValue: "Zawiera",
+   startsWithValue: "Zaczyna się od",
+   endsWithValue: "Kończy się na",
+   valueNotEqual: "Nie równa się",
+   valueEqual: "Równa się",
+   labelValueEquals: "Równa się:"
 };
 
 const lang = {

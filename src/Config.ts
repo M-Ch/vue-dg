@@ -26,7 +26,11 @@ export interface ILang {
    rangeFrom: string;
    rangeTo: string;
    containsValue: string;
-   valueEquals: string;
+   startsWithValue: string;
+   endsWithValue: string;
+   valueNotEqual: string;
+   valueEqual: string;
+   labelValueEquals: string;
 }
 
 const types: {[key: string]: ITypeConfig } = {};
@@ -45,8 +49,12 @@ let i18n: ILang = {
    dropdownLabel: "Select...",
    rangeFrom: "From:",
    rangeTo: "To:",
-   containsValue: "Contains:",
-   valueEquals: "Equals:"
+   containsValue: "Contains",
+   startsWithValue: "Starts with",
+   endsWithValue: "Ends with",
+   valueNotEqual: "Not equals",
+   valueEqual: "Equals",
+   labelValueEquals: "Equals:"
 };
 
 export interface ICalendar {

@@ -1,6 +1,6 @@
 import Vue from "vue";
 import { IFilterGroup, FilterOperator } from "../DataSource";
-import { localize } from "../Config";
+import { localize, ILang } from "../Config";
 import focus from "./FocusInput";
 
 interface IThis extends Vue {
@@ -20,18 +20,37 @@ export default Vue.extend({
    render(this: IThis, h) {
       const filter = this.value && this.value.length ? this.value[0].filters : null;
       const filterValue = filter ? filter[0].value : null;
+      const filterOperator = (filter ? filter[0].operator : null) ?? FilterOperator.Contains;
 
-      const emitValue = (value: string) => {
+      const emitValue = (value: string, operator: FilterOperator) => {
          const newValue = value
             ? [{
-               filters: [{ field:this.fieldName, operator: FilterOperator.Contains, value }]
+               filters: [{ field:this.fieldName, operator, value }]
             }]
             : [];
          this.$emit("input", newValue);
       };
 
+      const options: {key: keyof ILang; operator: FilterOperator}[] = [
+         { key: "containsValue", operator: FilterOperator.Contains },
+         { key: "valueEqual", operator: FilterOperator.Equals },
+         { key: "valueNotEqual", operator: FilterOperator.NotEqals },
+         { key: "startsWithValue", operator: FilterOperator.StartsWith },
+         { key: "endsWithValue", operator: FilterOperator.EndsWith },
+      ];
+
       return h("div", { }, [
-         localize("containsValue"),
+         h("select", {
+            on: {
+               change: (e:Event) => {
+                  const dropDown = e.target as HTMLSelectElement;
+                  emitValue(filterValue, options[dropDown.selectedIndex].operator);
+               }
+            },
+            domProps: {
+               selectedIndex: options.findIndex(i => i.operator === filterOperator)
+            }
+         }, options.map(i => h("option", localize(i.key)))),
          h("input", {
             domProps: {
                value: filterValue,
@@ -43,7 +62,7 @@ export default Vue.extend({
                { name: "focus" }
             ],
             on: {
-               input: (e: Event) => emitValue((e.target as HTMLInputElement).value)
+               input: (e: Event) => emitValue((e.target as HTMLInputElement).value, filterOperator)
             }
          })
       ]);

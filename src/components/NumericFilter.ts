@@ -57,7 +57,7 @@ export default Vue.extend({
 
       return h("div", { class: "dg-numeric-filter" }, [
          h("div", [
-            localize("valueEquals"),
+            localize("labelValueEquals"),
             h("NumericInput", {
                props: {
                   value: equalsFilter ? equalsFilter.filters[0].value : null,
