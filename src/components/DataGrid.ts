@@ -502,10 +502,11 @@ export default Vue.extend({
                on: {
                   input: (value: ds.IFilterGroup[]) => {
                      const newFilters = chain(this.vColumnFilters).where(i => i.field !== column.field).toList();
-                     newFilters.push({
-                        field: column.field as string,
-                        groups: value
-                     });
+                     if(value.length > 0)
+                        newFilters.push({
+                           field: column.field as string,
+                           groups: value
+                        });
                      this.$emit("update:columnFilters", newFilters);
                      this.vColumnFilters = newFilters;
                   }
