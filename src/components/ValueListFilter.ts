@@ -79,6 +79,7 @@ export default Vue.extend({
                   const newValues = values.slice(0);
                   newValues.push(availableOptions[dropDown.selectedIndex-1].key);
                   emitValue(newValues);
+                  setTimeout(() => (e.target as HTMLSelectElement).selectedIndex = 0);
                }
             },
             domProps: {
