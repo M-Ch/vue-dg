@@ -19,7 +19,7 @@
             <filter-field field="Name" value="a" operator="substr"></filter-field>
             <group-field :field="flag ? 'Name' : 'Release'" direction="desc"></group-field>
          </data-grid>
-         <data-grid :source="data" group-template="group-tpl" :pageable="false" no-data-template="no-data">
+         <data-grid :source="data" group-template="group-tpl" :pageable="false" no-data-template="no-data" selection-mode="multi">
             <data-column field="status" title="Status" :values="statuses"></data-column>
             <data-column field="created" title="Create date" type="date" :sort-order="1" sort-dir="desc"></data-column>
             <data-column field="important" title="Important" type="bool" icon="fa fa-exclamation"></data-column>

@@ -26,7 +26,11 @@ export default Vue.extend({
                e.preventDefault();
                e.stopPropagation();
                const value = this.value === null ? false : !this.value;
-               target.checked = value;
+               //values must be outside the callback itself. Otherwise values will not be applied to an html element
+               setTimeout(() => {
+                  target.checked = value;
+                  target.indeterminate = false;
+               });
                this.$emit("input", value);
                return false;
             }
