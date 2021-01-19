@@ -249,6 +249,7 @@ export default Vue.extend({
             this.vSelectedIds = this.vPageData.map(i => i[this.idField]);
             this.$emit("update:selectedIds", this.vSelectedIds);
             this.$emit("update:selected", this.vPageData);
+            return;
          }
 
          const selected: {[key: string]: boolean} = {};
