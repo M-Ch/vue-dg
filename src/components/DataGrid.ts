@@ -714,6 +714,8 @@ export default Vue.extend({
       const cols = columns.map(i => h("col", { style: { width: i.definition.width ? i.definition.width : undefined } }));
       if(hasDetails)
          cols.unshift(h("col", { style: { width: "5px" } }));
+      if(hasCheckboxes)
+         cols.unshift(h("col", { class: "dg-col-checkboxes" }));
       const thead = h("thead", {class: "dg-head"}, [h("tr", {}, headerCells)]);
       const dataRows = (() => {
          const grouping = this.findGrouping();
