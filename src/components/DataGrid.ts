@@ -784,7 +784,7 @@ export default Vue.extend({
          slot,
          dataTable,
          !hasData ? noDataPlaceholder : null,
-         this.pageable ? h("div", { class: "dg-footer"}, [this.canReload ? reloadLink : null, pageList, pager]) : null,
+         this.pageable ? h("div", { class: "dg-footer"}, [this.canReload ? reloadLink : null, pageList, pager, ...(this.$slots.footer ?? [])]) : null,
          this.vIsLoading ? h("div", { class: "dg-loader"}) : null,
       ]);
    },

@@ -91,7 +91,13 @@ You can use slots for defining column and header template.
     {row.price} {row.currency}
 </div>
 ```
-Slots can be selected dynamically if you bind a function returning slot name to `template` property.
+##### Footer template
+You can add custom content to the grid page footer using `footer` slot.
+```html
+<div slot="footer">
+    custom footer item
+</div>
+```
 ### `DataGrid` properties
 |Property|Type|Info|
 |--------|----|----|

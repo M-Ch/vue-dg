@@ -1,7 +1,7 @@
 {
   "name": "vue-dg",
   "description": "Data grid for Vue.js with sorting, filtering, paging, templating and remote data loading.",
-  "version": "1.5.2",
+  "version": "1.6.0",
   "private": false,
   "scripts": {
     "serve": "vue-cli-service serve",
